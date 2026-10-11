@@ -1,0 +1,104 @@
+version: "3.9"
+
+# ── Networks ──────────────────────────────────────────────────────────────────
+networks:
+  tprm-internal:
+    driver: bridge
+    internal: true       # No egress from the private zone
+  tprm-egress:
+    driver: bridge       # Only onetrust-egress service gets this
+
+# ── Volumes ───────────────────────────────────────────────────────────────────
+volumes:
+  postgres-data:
+  ollama-models:
+
+# ── Services ──────────────────────────────────────────────────────────────────
+services:
+
+  postgres:
+    image: postgres:16-alpine
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: tprm
+      POSTGRES_PASSWORD: tprm
+      POSTGRES_DB: tprm
+    volumes:
+      - postgres-data:/var/lib/postgresql/data
+    networks:
+      - tprm-internal
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U tprm"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+
+  ollama:
+    image: ollama/ollama:latest
+    restart: unless-stopped
+    volumes:
+      - ollama-models:/root/.ollama
+    networks:
+      - tprm-internal
+    healthcheck:
+      test: ["CMD-SHELL", "curl -sf http://localhost:11434/api/version || exit 1"]
+      interval: 10s
+      timeout: 5s
+      retries: 10
+
+  app:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    restart: unless-stopped
+    depends_on:
+      postgres:
+        condition: service_healthy
+      ollama:
+        condition: service_healthy
+    environment:
+      # Secrets — override with real values in production
+      TPRM_VAULT_KEY: ${TPRM_VAULT_KEY:?TPRM_VAULT_KEY must be set}
+      GATE_SIGNING_KEY: ${GATE_SIGNING_KEY:?GATE_SIGNING_KEY must be set}
+      # Database
+      TPRM_DATABASE_URL: postgresql+asyncpg://tprm:tprm@postgres:5432/tprm
+      # LLM
+      TPRM_OLLAMA_URL: http://ollama:11434
+      TPRM_LLM_MODEL: llama3.1:8b
+      # Adapters
+      TPRM_ONETRUST_ADAPTER: mock
+      # Logging
+      TPRM_LOG_LEVEL: INFO
+      TPRM_LOG_JSON: "true"
+    networks:
+      - tprm-internal  # private zone — no egress
+    ports:
+      - "8000:8000"
+    healthcheck:
+      test: ["CMD-SHELL", "curl -sf http://localhost:8000/api/v1/healthz || exit 1"]
+      interval: 10s
+      timeout: 5s
+      retries: 10
+
+  # Optional egress service — only enabled when TPRM_ONETRUST_ADAPTER=http
+  onetrust-egress:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    restart: unless-stopped
+    profiles:
+      - onetrust-http  # Only starts with: docker compose --profile onetrust-http up
+    depends_on:
+      - app
+    environment:
+      TPRM_VAULT_KEY: ${TPRM_VAULT_KEY:?}
+      GATE_SIGNING_KEY: ${GATE_SIGNING_KEY:?}
+      TPRM_DATABASE_URL: postgresql+asyncpg://tprm:tprm@postgres:5432/tprm
+      TPRM_ONETRUST_ADAPTER: http
+      TPRM_ONETRUST_BASE_URL: ${TPRM_ONETRUST_BASE_URL:-}
+      TPRM_ONETRUST_CLIENT_ID: ${TPRM_ONETRUST_CLIENT_ID:-}
+      TPRM_ONETRUST_CLIENT_SECRET: ${TPRM_ONETRUST_CLIENT_SECRET:-}
+    networks:
+      - tprm-internal
+      - tprm-egress    # This service gets external network access
+    command: ["python", "-m", "tprm.onetrust_sender"]

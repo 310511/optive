@@ -1,0 +1,267 @@
+# ──────────────────────────────────────────────
+# TPRM Org Policy Configuration
+# ──────────────────────────────────────────────
+
+# ── Org identity ──────────────────────────────
+org:
+  name: "ACME Corp"
+  domains:
+    - "acme.internal"
+    - "corp.acme.com"
+    - "acme-infra.net"
+  known_public_vendors:
+    - "AWS"
+    - "Microsoft"
+    - "Google Cloud"
+    - "Cloudflare"
+  # These names appearing in a document are PUBLIC level (e.g., cert names)
+  public_certification_keywords:
+    - "ISO 27001"
+    - "SOC 2 Type II"
+    - "PCI DSS"
+    - "HIPAA"
+    - "NIST CSF"
+    - "FedRAMP"
+
+# ── File / page limits ────────────────────────
+limits:
+  max_file_size_bytes: 52428800     # 50 MB
+  max_pages: 500
+  ocr_sparse_text_threshold: 100   # chars per page below which OCR is triggered
+  ocr_confidence_threshold: 40     # per-word confidence; words below are flagged
+  zip_bomb_ratio: 50               # max decompressed/compressed ratio
+
+# ── NLP classifier ────────────────────────────
+nlp:
+  embedding_model: "all-MiniLM-L6-v2"
+  classification_confidence_threshold: 0.60
+  # section class floor when classifier returns "unknown"
+  unknown_section_sensitivity_floor: "CONFIDENTIAL"
+
+# ── Per-recognizer score thresholds ──────────
+# (Presidio score is 0.0–1.0; entity detected if score >= threshold)
+recognizer_thresholds:
+  EMAIL_ADDRESS: 0.35
+  PHONE_NUMBER: 0.40
+  IBAN_CODE: 0.50
+  CREDIT_CARD: 0.40
+  US_SSN: 0.35
+  PASSPORT: 0.45
+  IP_ADDRESS: 0.40
+  MAC_ADDRESS: 0.50
+  CREDENTIAL_URL: 0.40
+  API_KEY: 0.35
+  PEM_PRIVATE_KEY: 0.90
+  INTERNAL_HOSTNAME: 0.45
+  PERSON: 0.40
+  ORG: 0.35
+  LOCATION: 0.35
+  DATE_OF_BIRTH: 0.45
+  EMPLOYEE_ID: 0.50
+  CONTRACT_NUMBER: 0.50
+  BANK_ACCOUNT: 0.50
+
+# Gate re-scan uses stricter thresholds (lower = more aggressive detection)
+gate_rescan_thresholds:
+  EMAIL_ADDRESS: 0.20
+  PHONE_NUMBER: 0.25
+  IBAN_CODE: 0.30
+  CREDIT_CARD: 0.25
+  US_SSN: 0.20
+  API_KEY: 0.20
+  PEM_PRIVATE_KEY: 0.80
+  INTERNAL_HOSTNAME: 0.30
+  PERSON: 0.25
+  default: 0.30
+
+# ── Entropy gate ──────────────────────────────
+gate:
+  entropy_window_chars: 40
+  entropy_threshold_bits: 4.5
+  # Token grammar patterns that must be matched for placeholder validation
+  valid_token_patterns:
+    - '^\[REDACTED:[A-Z_]+\]$'
+    - '^<<[A-Z_]+_[0-9a-f]{8}>>$'
+    - '^\[INTERNAL_IP_RANGE\]$'
+    - '^\[PERSON:[A-Z_]+\]$'
+    - '^\[HOST:[a-z_]+\]$'
+
+# ── Impact table (entity type → default level) ────────────────────────────
+impact_table:
+  # RESTRICTED — never crosses gate as raw data
+  CREDIT_CARD:     { level: RESTRICTED, action: redact }
+  IBAN_CODE:       { level: RESTRICTED, action: redact }
+  BANK_ACCOUNT:    { level: RESTRICTED, action: redact }
+  US_SSN:          { level: RESTRICTED, action: redact }
+  PASSPORT:        { level: RESTRICTED, action: redact }
+  DATE_OF_BIRTH:   { level: RESTRICTED, action: redact }
+  API_KEY:         { level: RESTRICTED, action: redact }
+  PEM_PRIVATE_KEY: { level: RESTRICTED, action: redact }
+  CREDENTIAL_URL:  { level: RESTRICTED, action: redact }
+
+  # CONFIDENTIAL — tokenized by default
+  EMAIL_ADDRESS:   { level: CONFIDENTIAL, action: tokenize }
+  PHONE_NUMBER:    { level: CONFIDENTIAL, action: tokenize }
+  IP_ADDRESS:      { level: CONFIDENTIAL, action: generalize }
+  MAC_ADDRESS:     { level: CONFIDENTIAL, action: redact }
+  INTERNAL_HOSTNAME: { level: CONFIDENTIAL, action: generalize }
+  EMPLOYEE_ID:     { level: CONFIDENTIAL, action: tokenize }
+  CONTRACT_NUMBER: { level: CONFIDENTIAL, action: tokenize }
+  PERSON:          { level: CONFIDENTIAL, action: generalize }
+  ORG:             { level: INTERNAL,     action: keep }
+  LOCATION:        { level: INTERNAL,     action: keep }
+
+  # INTERNAL — kept by default
+  PHONE_NUMBER_CORPORATE: { level: INTERNAL, action: keep }
+
+  # PUBLIC
+  IP_ADDRESS_PUBLIC: { level: PUBLIC, action: keep }
+
+# ── Section class minimum sensitivity floors ──
+section_floors:
+  access_control:        CONFIDENTIAL
+  encryption:            CONFIDENTIAL
+  incident_response:     CONFIDENTIAL
+  bc_dr:                 INTERNAL
+  subprocessors:         CONFIDENTIAL
+  data_retention:        CONFIDENTIAL
+  audit_scope:           INTERNAL
+  exceptions_qualifications: CONFIDENTIAL
+  unknown:               CONFIDENTIAL
+  default:               INTERNAL
+
+# ── Doc type minimum sensitivity floors ───────
+doc_type_floors:
+  soc2_report:           CONFIDENTIAL
+  iso_cert:              INTERNAL
+  pentest_report:        RESTRICTED
+  security_questionnaire: CONFIDENTIAL
+  dpa:                   RESTRICTED
+  msa:                   INTERNAL
+  sla:                   INTERNAL
+  architecture_doc:      CONFIDENTIAL
+  bcp_dr_plan:           CONFIDENTIAL
+  other:                 CONFIDENTIAL
+
+# ── Priority-ordered policy rules ─────────────
+# Lower priority number = higher priority (first match wins)
+rules:
+  - id: R001
+    priority: 10
+    when:
+      entity_type: [CREDIT_CARD, IBAN_CODE, BANK_ACCOUNT, US_SSN, PASSPORT, DATE_OF_BIRTH]
+    level: RESTRICTED
+    action: redact
+    rationale: "Payment instrument or government ID — always RESTRICTED regardless of context"
+
+  - id: R002
+    priority: 11
+    when:
+      entity_type: [API_KEY, PEM_PRIVATE_KEY, CREDENTIAL_URL]
+    level: RESTRICTED
+    action: redact
+    rationale: "Credentials and key material — always RESTRICTED"
+
+  - id: R003
+    priority: 15
+    when:
+      entity_type: [EMAIL_ADDRESS, PHONE_NUMBER, EMPLOYEE_ID, CONTRACT_NUMBER]
+      is_example: true
+    level: PUBLIC
+    action: keep
+    rationale: "Example/sample data markers indicate non-real PII; downgrade to PUBLIC"
+
+  - id: R004
+    priority: 16
+    when:
+      entity_type: [PERSON]
+      is_example: true
+    level: PUBLIC
+    action: keep
+    rationale: "Fictional person names in examples are not PII"
+
+  - id: R005
+    priority: 20
+    when:
+      entity_type: [IP_ADDRESS]
+      source: [native, ocr]
+      section_class: [access_control, encryption, architecture_doc]
+    level: CONFIDENTIAL
+    action: generalize
+    rationale: "Internal IPs in technical sections are CONFIDENTIAL"
+
+  - id: R006
+    priority: 21
+    when:
+      entity_type: [INTERNAL_HOSTNAME]
+    level: CONFIDENTIAL
+    action: generalize
+    rationale: "Internal hostnames reveal org topology — CONFIDENTIAL"
+
+  - id: R007
+    priority: 22
+    when:
+      entity_type: [PERSON]
+      has_relation: [signature_block]
+    level: CONFIDENTIAL
+    action: tokenize
+    rationale: "Named signatory in signature block — CONFIDENTIAL, tokenize for traceability"
+
+  - id: R008
+    priority: 23
+    when:
+      entity_type: [PERSON]
+      has_relation: [auditor_role]
+    level: INTERNAL
+    action: keep
+    rationale: "Named auditor in audit scope section — INTERNAL, role is public"
+
+  - id: R009
+    priority: 25
+    when:
+      entity_type: [EMAIL_ADDRESS]
+      section_class: [audit_scope]
+    level: INTERNAL
+    action: keep
+    rationale: "Auditor contact emails in audit scope are INTERNAL"
+
+  - id: R010
+    priority: 30
+    when:
+      source: [ocr]
+      ocr_conf_lt: 40
+    level_boost: 1
+    rationale: "Low-confidence OCR — escalate sensitivity level by 1"
+
+  - id: R011
+    priority: 35
+    when:
+      entity_type: [PERSON, EMAIL_ADDRESS, PHONE_NUMBER, EMPLOYEE_ID]
+      doc_type: [dpa]
+    level: RESTRICTED
+    action: redact
+    rationale: "DPA documents — all personal data is RESTRICTED"
+
+  - id: R012
+    priority: 40
+    when:
+      entity_type: [PERSON, EMAIL_ADDRESS, PHONE_NUMBER]
+      doc_type: [pentest_report]
+    level: RESTRICTED
+    action: redact
+    rationale: "Pen-test reports — named individuals are RESTRICTED"
+
+  - id: R013
+    priority: 90
+    when:
+      entity_type: [ORG, LOCATION]
+    level: INTERNAL
+    action: keep
+    rationale: "Org and location names — INTERNAL by default"
+
+  - id: R099
+    priority: 99
+    when: {}
+    level: CONFIDENTIAL
+    action: tokenize
+    rationale: "Catch-all fallback: any unmatched entity is CONFIDENTIAL"

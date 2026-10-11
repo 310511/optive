@@ -1,0 +1,16 @@
+{
+  "version": "v1",
+  "hooks": [
+    {
+      "name": "Run Security Tests on Gate/Sanitize Save",
+      "trigger": "PostFileSave",
+      "description": "Automatically runs the security test suite (leak-canary, gate bypass, fail-closed) whenever any file in src/tprm/gate/ or src/tprm/sanitize/ is saved.",
+      "matcher": "src/tprm/(gate|sanitize)/.*\\.py$",
+      "action": {
+        "type": "command",
+        "command": "cd /Users/utsavgautam/OPTIVE/tprm && pytest tests/security -q 2>&1",
+        "timeout": 120
+      }
+    }
+  ]
+}

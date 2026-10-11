@@ -1,0 +1,246 @@
+# ──────────────────────────────────────────────
+# TPRM Controls Catalog
+# ISO 27001:2022 Annex A + SOC 2 TSC + NIST CSF 2.0
+# ──────────────────────────────────────────────
+
+# Each control has:
+#   id: internal ref
+#   framework: ISO27001 | SOC2 | NIST_CSF
+#   ref: framework-specific control reference
+#   name: human-readable name
+#   categories: list of risk taxonomy category IDs that map to this control
+#   section_classes: list of section_class values that map to this control
+#   keywords: additional keyword triggers
+
+controls:
+  # ── Access Management ──────────────────────
+
+  - id: CTL-001
+    framework: ISO27001
+    ref: "A.5.15"
+    name: "Access Control"
+    categories: [ACCESS_MGMT]
+    section_classes: [access_control]
+    keywords: ["access control", "authorization", "least privilege"]
+
+  - id: CTL-002
+    framework: ISO27001
+    ref: "A.8.5"
+    name: "Secure Authentication"
+    categories: [ACCESS_MGMT]
+    section_classes: [access_control]
+    keywords: ["MFA", "multi-factor", "authentication", "password policy"]
+
+  - id: CTL-003
+    framework: SOC2
+    ref: "CC6.1"
+    name: "Logical and Physical Access Controls"
+    categories: [ACCESS_MGMT]
+    section_classes: [access_control]
+    keywords: ["logical access", "physical access", "role-based access"]
+
+  - id: CTL-004
+    framework: NIST_CSF
+    ref: "PR.AC-1"
+    name: "Identities and Credentials Managed"
+    categories: [ACCESS_MGMT]
+    section_classes: [access_control]
+    keywords: ["identity management", "credential management", "IAM"]
+
+  - id: CTL-005
+    framework: ISO27001
+    ref: "A.5.18"
+    name: "Access Rights"
+    categories: [ACCESS_MGMT]
+    section_classes: [access_control]
+    keywords: ["access rights", "user provisioning", "deprovisioning", "privileged access"]
+
+  # ── Encryption ─────────────────────────────
+
+  - id: CTL-010
+    framework: ISO27001
+    ref: "A.8.24"
+    name: "Use of Cryptography"
+    categories: [ENCRYPTION]
+    section_classes: [encryption]
+    keywords: ["encryption", "cryptography", "cipher", "AES", "RSA"]
+
+  - id: CTL-011
+    framework: ISO27001
+    ref: "A.8.25"
+    name: "Secure Development Life Cycle"
+    categories: [ENCRYPTION]
+    section_classes: [encryption]
+    keywords: ["TLS", "certificate", "key management", "KMS", "HSM"]
+
+  - id: CTL-012
+    framework: SOC2
+    ref: "CC9.1"
+    name: "Risk Mitigation — Encryption"
+    categories: [ENCRYPTION]
+    section_classes: [encryption]
+    keywords: ["data at rest", "data in transit", "end-to-end encryption"]
+
+  - id: CTL-013
+    framework: NIST_CSF
+    ref: "PR.DS-1"
+    name: "Data-at-Rest Protection"
+    categories: [ENCRYPTION, PRIVACY_DATA]
+    section_classes: [encryption, data_retention]
+    keywords: ["data at rest", "storage encryption", "database encryption"]
+
+  # ── Incident Response ──────────────────────
+
+  - id: CTL-020
+    framework: ISO27001
+    ref: "A.5.24"
+    name: "Information Security Incident Management Planning"
+    categories: [INCIDENT_RESPONSE]
+    section_classes: [incident_response]
+    keywords: ["incident response plan", "IRP", "CSIRT", "playbook"]
+
+  - id: CTL-021
+    framework: ISO27001
+    ref: "A.5.26"
+    name: "Response to Information Security Incidents"
+    categories: [INCIDENT_RESPONSE]
+    section_classes: [incident_response]
+    keywords: ["incident handling", "breach response", "containment", "eradication"]
+
+  - id: CTL-022
+    framework: SOC2
+    ref: "CC7.3"
+    name: "Incident Identification and Response"
+    categories: [INCIDENT_RESPONSE]
+    section_classes: [incident_response]
+    keywords: ["detection", "SIEM", "alert", "notification"]
+
+  - id: CTL-023
+    framework: NIST_CSF
+    ref: "RS.RP-1"
+    name: "Response Plan Executed"
+    categories: [INCIDENT_RESPONSE]
+    section_classes: [incident_response]
+    keywords: ["breach notification", "72 hour", "regulatory notification"]
+
+  # ── Business Continuity / DR ───────────────
+
+  - id: CTL-030
+    framework: ISO27001
+    ref: "A.5.29"
+    name: "Information Security During Disruption"
+    categories: [BC_DR]
+    section_classes: [bc_dr]
+    keywords: ["BCP", "business continuity", "disaster recovery"]
+
+  - id: CTL-031
+    framework: ISO27001
+    ref: "A.8.13"
+    name: "Information Backup"
+    categories: [BC_DR]
+    section_classes: [bc_dr]
+    keywords: ["backup", "restore", "recovery", "RPO", "RTO"]
+
+  - id: CTL-032
+    framework: SOC2
+    ref: "A1.2"
+    name: "Availability — Recovery"
+    categories: [BC_DR, OPERATIONAL_RESILIENCE]
+    section_classes: [bc_dr]
+    keywords: ["failover", "redundancy", "high availability", "uptime"]
+
+  # ── Privacy / Data Protection ──────────────
+
+  - id: CTL-040
+    framework: ISO27001
+    ref: "A.5.34"
+    name: "Privacy and Protection of PII"
+    categories: [PRIVACY_DATA]
+    section_classes: [data_retention, subprocessors]
+    keywords: ["GDPR", "CCPA", "personal data", "data subject"]
+
+  - id: CTL-041
+    framework: SOC2
+    ref: "P1.1"
+    name: "Privacy Notice"
+    categories: [PRIVACY_DATA]
+    section_classes: [data_retention]
+    keywords: ["privacy notice", "privacy policy", "data processing agreement"]
+
+  - id: CTL-042
+    framework: NIST_CSF
+    ref: "PR.IP-11"
+    name: "Cybersecurity Included in HR Practices"
+    categories: [PRIVACY_DATA]
+    section_classes: [data_retention]
+    keywords: ["data retention", "data deletion", "right to erasure"]
+
+  # ── Subprocessors / Supply Chain ───────────
+
+  - id: CTL-050
+    framework: ISO27001
+    ref: "A.5.19"
+    name: "Information Security in Supplier Relationships"
+    categories: [SUBPROCESSOR]
+    section_classes: [subprocessors]
+    keywords: ["subprocessor", "supplier", "third party", "vendor assessment"]
+
+  - id: CTL-051
+    framework: ISO27001
+    ref: "A.5.21"
+    name: "Managing Information Security in the ICT Supply Chain"
+    categories: [SUBPROCESSOR]
+    section_classes: [subprocessors]
+    keywords: ["supply chain", "fourth-party", "subcontractor", "outsourcing"]
+
+  - id: CTL-052
+    framework: SOC2
+    ref: "CC9.2"
+    name: "Vendor and Business Partner Risk Management"
+    categories: [SUBPROCESSOR, FINANCIAL]
+    section_classes: [subprocessors]
+    keywords: ["vendor risk", "third party risk", "due diligence"]
+
+  # ── Compliance / Audit ─────────────────────
+
+  - id: CTL-060
+    framework: ISO27001
+    ref: "A.5.36"
+    name: "Compliance with Policies, Rules and Standards"
+    categories: [COMPLIANCE_AUDIT]
+    section_classes: [audit_scope, exceptions_qualifications]
+    keywords: ["compliance", "regulatory", "audit finding", "exception"]
+
+  - id: CTL-061
+    framework: SOC2
+    ref: "CC4.1"
+    name: "Monitors Controls"
+    categories: [COMPLIANCE_AUDIT]
+    section_classes: [audit_scope]
+    keywords: ["audit", "testing", "monitoring", "control effectiveness"]
+
+  - id: CTL-062
+    framework: NIST_CSF
+    ref: "ID.GV-3"
+    name: "Legal and Regulatory Requirements Understood"
+    categories: [COMPLIANCE_AUDIT]
+    section_classes: [audit_scope]
+    keywords: ["regulatory requirement", "legal obligation", "certification"]
+
+  # ── AI / Model Risk ─────────────────────────
+
+  - id: CTL-070
+    framework: ISO27001
+    ref: "A.5.37"
+    name: "Documented Operating Procedures (AI)"
+    categories: [AI_MODEL_RISK]
+    section_classes: []
+    keywords: ["AI governance", "model risk", "LLM", "model card", "explainability"]
+
+  - id: CTL-071
+    framework: NIST_CSF
+    ref: "GV.OC-5"
+    name: "Outcomes of Organizational Risk Decisions Understood"
+    categories: [AI_MODEL_RISK, COMPLIANCE_AUDIT]
+    section_classes: []
+    keywords: ["AI bias", "model fairness", "AI policy", "AI risk management"]

@@ -1,0 +1,199 @@
+# ──────────────────────────────────────────────
+# TPRM Risk Taxonomy
+# ──────────────────────────────────────────────
+# 11 categories with weights for severity scoring.
+# likelihood_default and impact_default are 0.0–1.0.
+
+categories:
+  - id: INFO_SEC
+    name: "Information Security"
+    description: "General information security controls, vulnerabilities, patching"
+    likelihood_default: 0.6
+    impact_default: 0.7
+    keywords:
+      - "vulnerability"
+      - "patch"
+      - "penetration test"
+      - "security control"
+      - "firewall"
+      - "antivirus"
+      - "endpoint protection"
+      - "vulnerability management"
+
+  - id: PRIVACY_DATA
+    name: "Privacy / Data Protection"
+    description: "Personal data handling, GDPR, CCPA, data subject rights"
+    likelihood_default: 0.5
+    impact_default: 0.9
+    keywords:
+      - "personal data"
+      - "data subject"
+      - "GDPR"
+      - "CCPA"
+      - "privacy"
+      - "data protection"
+      - "retention"
+      - "deletion"
+      - "consent"
+
+  - id: ACCESS_MGMT
+    name: "Access Management"
+    description: "Identity, authentication, authorization, privileged access"
+    likelihood_default: 0.6
+    impact_default: 0.8
+    keywords:
+      - "access control"
+      - "authentication"
+      - "authorization"
+      - "MFA"
+      - "multi-factor"
+      - "privileged access"
+      - "PAM"
+      - "IAM"
+      - "least privilege"
+      - "separation of duties"
+
+  - id: ENCRYPTION
+    name: "Encryption"
+    description: "Data at rest / in transit encryption, key management"
+    likelihood_default: 0.4
+    impact_default: 0.8
+    keywords:
+      - "encryption"
+      - "TLS"
+      - "SSL"
+      - "certificate"
+      - "key management"
+      - "KMS"
+      - "AES"
+      - "RSA"
+      - "data at rest"
+      - "data in transit"
+
+  - id: INCIDENT_RESPONSE
+    name: "Incident Response"
+    description: "IR planning, breach notification, detection capabilities"
+    likelihood_default: 0.5
+    impact_default: 0.8
+    keywords:
+      - "incident response"
+      - "breach"
+      - "notification"
+      - "SIEM"
+      - "detection"
+      - "forensics"
+      - "playbook"
+      - "escalation"
+      - "CSIRT"
+
+  - id: BC_DR
+    name: "Business Continuity / Disaster Recovery"
+    description: "RTO, RPO, failover, backup and recovery capabilities"
+    likelihood_default: 0.4
+    impact_default: 0.7
+    keywords:
+      - "business continuity"
+      - "disaster recovery"
+      - "RTO"
+      - "RPO"
+      - "backup"
+      - "recovery"
+      - "failover"
+      - "BCP"
+      - "DR"
+
+  - id: COMPLIANCE_AUDIT
+    name: "Compliance / Audit"
+    description: "Regulatory compliance status, audit findings, certifications"
+    likelihood_default: 0.5
+    impact_default: 0.6
+    keywords:
+      - "compliance"
+      - "audit"
+      - "finding"
+      - "exception"
+      - "qualification"
+      - "certification"
+      - "attestation"
+      - "SOC 2"
+      - "ISO 27001"
+
+  - id: SUBPROCESSOR
+    name: "Subprocessor / Fourth-Party"
+    description: "Third/fourth-party vendor risks, supply chain, subcontracting"
+    likelihood_default: 0.5
+    impact_default: 0.7
+    keywords:
+      - "subprocessor"
+      - "fourth-party"
+      - "supply chain"
+      - "subcontractor"
+      - "outsource"
+      - "third party"
+      - "vendor"
+
+  - id: FINANCIAL
+    name: "Financial"
+    description: "Financial viability, cyber insurance, contract terms"
+    likelihood_default: 0.3
+    impact_default: 0.6
+    keywords:
+      - "financial"
+      - "insurance"
+      - "cyber insurance"
+      - "indemnity"
+      - "liability"
+      - "SLA penalty"
+      - "revenue"
+
+  - id: OPERATIONAL_RESILIENCE
+    name: "Operational Resilience"
+    description: "Service availability, capacity, change management, SLAs"
+    likelihood_default: 0.4
+    impact_default: 0.6
+    keywords:
+      - "availability"
+      - "uptime"
+      - "SLA"
+      - "capacity"
+      - "change management"
+      - "resilience"
+      - "redundancy"
+      - "monitoring"
+
+  - id: AI_MODEL_RISK
+    name: "AI / Model Risk"
+    description: "AI model usage, bias, model governance, LLM risks"
+    likelihood_default: 0.4
+    impact_default: 0.7
+    keywords:
+      - "artificial intelligence"
+      - "machine learning"
+      - "model"
+      - "AI"
+      - "LLM"
+      - "bias"
+      - "hallucination"
+      - "model governance"
+      - "explainability"
+
+# ── Severity thresholds ──────────────────────
+# score = likelihood × impact × control_gap_factor × vendor_criticality × 100
+severity_thresholds:
+  Critical: 75
+  High: 50
+  Medium: 25
+  Low: 0
+
+# ── Control gap factors ───────────────────────
+control_gap_factors:
+  satisfied: 1.0
+  partial: 1.3
+  missing: 1.6
+
+# ── Audit qualification boosters (added to score, capped at 100) ─────────
+audit_boosters:
+  soc2_exception: 15
+  expired_certificate: 10
+  qualified_opinion: 20
+  adverse_opinion: 35

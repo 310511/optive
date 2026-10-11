@@ -1,0 +1,81 @@
+# ──────────────────────────────────────────────
+# TPRM Workflow Configuration
+# ──────────────────────────────────────────────
+
+# ── SLA durations by severity ─────────────────
+# Days from finding creation until remediation is due
+sla_days:
+  Critical: 7
+  High: 30
+  Medium: 90
+  Low: 180
+
+# ── Escalation rules ──────────────────────────
+escalation:
+  # Critical findings → CISO queue immediately on creation
+  critical_immediate_escalation: true
+  ciso_queue_role: "ciso"
+
+  # High findings unresolved past SLA → escalate
+  high_past_sla_escalate: true
+
+  # Repeated finding patterns across assessments
+  repeated_finding_threshold: 2    # same risk category + same vendor → escalate after N occurrences
+  cross_vendor_repeated_threshold: 3  # same risk category across N different vendors → flag for program review
+
+# ── Approval matrix ───────────────────────────
+# Roles: analyst, risk_manager, ciso
+approval_matrix:
+  Low:
+    approvers: [analyst, risk_manager]
+    require_separation: false      # approver may == creator
+  Medium:
+    approvers: [analyst, risk_manager]
+    require_separation: false
+  High:
+    approvers: [risk_manager, ciso]
+    require_separation: true       # approver must != creator
+  Critical:
+    approvers: [ciso]
+    require_separation: true
+
+# ── Risk acceptance ───────────────────────────
+risk_acceptance:
+  require_expiry: true
+  max_acceptance_days: 365         # risk acceptance cannot be valid for more than 1 year
+  require_justification: true
+  min_justification_length: 50    # characters
+
+# ── Allowed state transitions ─────────────────
+transitions:
+  Draft:
+    - InReview
+  InReview:
+    - RemediationRequested
+    - Escalated
+  RemediationRequested:
+    - RemediationInProgress
+    - Escalated
+  RemediationInProgress:
+    - Verified
+    - RemediationRequested    # vendor resubmits if verification fails
+  Verified:
+    - Accepted
+    - Rejected
+    - Escalated
+  Escalated:
+    - Accepted
+    - Rejected
+  Accepted: []                    # terminal
+  Rejected: []                    # terminal
+
+# ── OneTrust status mapping ───────────────────
+onetrust_status_map:
+  Draft: "DRAFT"
+  InReview: "IN_REVIEW"
+  RemediationRequested: "REMEDIATION_REQUESTED"
+  RemediationInProgress: "REMEDIATION_IN_PROGRESS"
+  Verified: "VERIFIED"
+  Accepted: "ACCEPTED"
+  Rejected: "REJECTED"
+  Escalated: "ESCALATED"
