@@ -3,248 +3,272 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>TPRM — Vendor Risk Platform</title>
+<title>Vendor Document Checker</title>
 <style>
 :root {
-  --bg:       #0d1117;
-  --s1:       #161b22;
-  --s2:       #1c2128;
-  --s3:       #21262d;
-  --border:   #30363d;
-  --accent:   #4f81ff;
-  --text:     #e6edf3;
-  --muted:    #8b949e;
-  --green:    #3fb950;
-  --yellow:   #d29922;
-  --orange:   #db6d28;
-  --red:      #f85149;
-  --r: 10px; --rs: 7px;
+  --bg:     #f8f9fb;
+  --white:  #ffffff;
+  --border: #e5e7eb;
+  --blue:   #3b6fef;
+  --blue2:  #2554d1;
+  --text:   #111827;
+  --muted:  #6b7280;
+  --light:  #f3f4f6;
+  --red:    #dc2626;
+  --orange: #ea580c;
+  --yellow: #d97706;
+  --green:  #16a34a;
+  --red-bg:    #fef2f2;
+  --orange-bg: #fff7ed;
+  --yellow-bg: #fffbeb;
+  --green-bg:  #f0fdf4;
+  --red-border:    #fecaca;
+  --orange-border: #fed7aa;
+  --yellow-border: #fde68a;
+  --green-border:  #bbf7d0;
+  --radius: 12px;
+  --shadow: 0 1px 3px rgba(0,0,0,.08), 0 1px 2px rgba(0,0,0,.04);
 }
 *{box-sizing:border-box;margin:0;padding:0}
-body{background:var(--bg);color:var(--text);font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",system-ui,sans-serif;min-height:100vh;font-size:14px}
+body{background:var(--bg);color:var(--text);font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",system-ui,sans-serif;min-height:100vh;font-size:15px;line-height:1.5}
 
-/* nav */
-nav{height:52px;background:var(--s1);border-bottom:1px solid var(--border);display:flex;align-items:center;padding:0 24px;gap:10px;position:sticky;top:0;z-index:100}
-.logo{font-weight:700;font-size:15px}
-.logo span{color:var(--accent)}
-.tag{background:rgba(79,129,255,.12);color:#7aa2ff;border:1px solid rgba(79,129,255,.25);border-radius:20px;font-size:11px;padding:2px 9px;font-weight:600}
-#navStatus{margin-left:auto;font-size:12px;color:var(--muted)}
+/* ── Nav ── */
+nav{background:var(--white);border-bottom:1px solid var(--border);padding:0 24px;height:58px;display:flex;align-items:center;gap:10px;position:sticky;top:0;z-index:100;box-shadow:var(--shadow)}
+.nav-icon{font-size:22px}
+.nav-title{font-weight:700;font-size:16px}
+.nav-sub{color:var(--muted);font-size:13px;margin-left:4px}
+.nav-right{margin-left:auto;font-size:13px;color:var(--muted);display:flex;align-items:center;gap:6px}
+.nav-dot{width:8px;height:8px;border-radius:50%;background:var(--green)}
 
-/* layout */
-.page{max-width:1160px;margin:0 auto;padding:24px 18px;display:grid;grid-template-columns:330px 1fr;gap:18px;align-items:start}
-@media(max-width:780px){.page{grid-template-columns:1fr}}
+/* ── Page ── */
+.page{max-width:1080px;margin:0 auto;padding:28px 20px;display:grid;grid-template-columns:320px 1fr;gap:20px;align-items:start}
+@media(max-width:720px){.page{grid-template-columns:1fr}}
 
-/* card */
-.card{background:var(--s1);border:1px solid var(--border);border-radius:var(--r)}
-.card-hd{padding:14px 16px 0;font-size:11px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.8px}
-.card-bd{padding:14px 16px 16px}
+/* ── Cards ── */
+.card{background:var(--white);border:1px solid var(--border);border-radius:var(--radius);box-shadow:var(--shadow)}
 
-/* drop zone */
-.drop{border:2px dashed var(--border);border-radius:var(--rs);padding:26px 14px;text-align:center;cursor:pointer;transition:all .2s;position:relative;margin-bottom:12px}
-.drop:hover,.drop.over{border-color:var(--accent);background:rgba(79,129,255,.04)}
+/* ── Upload panel ── */
+.upload-panel .card{padding:20px}
+.upload-title{font-weight:700;font-size:16px;margin-bottom:4px}
+.upload-sub{color:var(--muted);font-size:13px;margin-bottom:16px}
+
+.drop{border:2px dashed #d1d5db;border-radius:10px;padding:28px 16px;text-align:center;cursor:pointer;transition:all .2s;position:relative;background:var(--light)}
+.drop:hover,.drop.over{border-color:var(--blue);background:#eff4ff}
 .drop input{position:absolute;inset:0;opacity:0;cursor:pointer;width:100%;height:100%}
-.drop-icon{font-size:26px;display:block;margin-bottom:6px}
-.drop-text{font-size:13px}.drop-hint{font-size:11px;color:var(--muted);margin-top:3px}
-.drop-name{font-size:12px;color:#7aa2ff;margin-top:5px;font-weight:500;word-break:break-all}
+.drop-emoji{font-size:32px;display:block;margin-bottom:8px}
+.drop-main{font-size:14px;font-weight:500;color:var(--text)}
+.drop-main span{color:var(--blue);text-decoration:underline}
+.drop-hint{font-size:12px;color:var(--muted);margin-top:4px}
+.drop-file{font-size:13px;color:var(--blue);font-weight:500;margin-top:8px;word-break:break-all}
 
-.field{margin-bottom:10px}
-.field label{display:block;font-size:11px;color:var(--muted);margin-bottom:4px;font-weight:600;text-transform:uppercase;letter-spacing:.4px}
-.field input{width:100%;background:var(--s2);border:1px solid var(--border);border-radius:var(--rs);padding:8px 10px;color:var(--text);font-size:13px;outline:none;transition:border-color .2s}
-.field input:focus{border-color:var(--accent)}
-.field input::placeholder{color:var(--muted)}
+.field{margin-top:14px}
+.field label{font-size:13px;font-weight:600;color:var(--text);display:block;margin-bottom:5px}
+.field input{width:100%;border:1.5px solid var(--border);border-radius:8px;padding:9px 12px;font-size:14px;color:var(--text);outline:none;background:var(--white);transition:border-color .2s}
+.field input:focus{border-color:var(--blue)}
+.field input::placeholder{color:#9ca3af}
+.field-help{font-size:12px;color:var(--muted);margin-top:4px}
 
-.btn{width:100%;padding:10px;background:var(--accent);border:none;border-radius:var(--rs);color:#fff;font-size:14px;font-weight:600;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:8px;transition:opacity .15s}
-.btn:hover:not(:disabled){opacity:.88}
-.btn:disabled{opacity:.38;cursor:not-allowed}
+.btn{width:100%;margin-top:16px;padding:11px;background:var(--blue);border:none;border-radius:9px;color:#fff;font-size:15px;font-weight:600;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:8px;transition:background .15s}
+.btn:hover:not(:disabled){background:var(--blue2)}
+.btn:disabled{opacity:.45;cursor:not-allowed}
 
-/* pipeline */
-.pipe{margin-top:14px}
-.ps{display:flex;align-items:center;gap:9px;padding:5px 0;font-size:12px;color:var(--muted);transition:color .3s}
-.ps .dot{width:7px;height:7px;border-radius:50%;background:var(--border);flex-shrink:0;transition:background .3s}
-.ps .lbl{flex:1}.ps .ms{font-size:11px;color:var(--muted)}
-.ps.active{color:var(--text)}.ps.active .dot{background:var(--accent);box-shadow:0 0 0 3px rgba(79,129,255,.2);animation:pulse .9s infinite}
-.ps.done{color:var(--green)}.ps.done .dot{background:var(--green)}
-@keyframes pulse{0%,100%{opacity:1}50%{opacity:.4}}
+.err-box{margin-top:10px;background:var(--red-bg);border:1px solid var(--red-border);border-radius:8px;padding:10px 13px;color:var(--red);font-size:13px;display:flex;gap:7px;align-items:flex-start}
 
-/* empty */
-.empty{display:flex;flex-direction:column;align-items:center;justify-content:center;min-height:420px;color:var(--muted);text-align:center;gap:8px}
-.empty-icon{font-size:46px;opacity:.35}
+/* ── Progress panel ── */
+.prog-panel{margin-top:14px}
+.prog-panel .card{padding:16px 18px}
+.prog-title{font-weight:700;font-size:13px;color:var(--muted);text-transform:uppercase;letter-spacing:.6px;margin-bottom:12px}
+.step{display:flex;align-items:center;gap:10px;padding:5px 0;font-size:13px;color:#9ca3af}
+.step .dot{width:8px;height:8px;border-radius:50%;background:#e5e7eb;flex-shrink:0;transition:background .3s}
+.step .lbl{flex:1}
+.step .ms{font-size:11px}
+.step.active{color:var(--text);font-weight:500}
+.step.active .dot{background:var(--blue);box-shadow:0 0 0 3px #dbeafe;animation:pulse .9s infinite}
+.step.done{color:var(--green)}.step.done .dot{background:var(--green)}
+@keyframes pulse{0%,100%{opacity:1}50%{opacity:.5}}
 
-/* assess header */
-.ah{padding:16px 18px;border-bottom:1px solid var(--border);display:flex;justify-content:space-between;align-items:flex-start;flex-wrap:wrap;gap:10px}
-.ah-title{font-weight:700;font-size:15px;margin-bottom:2px}
-.ah-meta{font-size:12px;color:var(--muted)}
-.badges{display:flex;gap:7px;flex-wrap:wrap;align-items:center}
-.b{padding:4px 10px;border-radius:20px;font-size:11px;font-weight:700}
-.b-red{background:rgba(248,81,73,.12);color:var(--red);border:1px solid rgba(248,81,73,.28)}
-.b-yellow{background:rgba(210,153,34,.1);color:var(--yellow);border:1px solid rgba(210,153,34,.28)}
-.b-green{background:rgba(63,185,80,.1);color:var(--green);border:1px solid rgba(63,185,80,.22)}
-.b-blue{background:rgba(79,129,255,.1);color:#7aa2ff;border:1px solid rgba(79,129,255,.22)}
-.b-grey{background:var(--s2);color:var(--muted);border:1px solid var(--border)}
+/* ── Empty state ── */
+.empty{display:flex;flex-direction:column;align-items:center;justify-content:center;min-height:400px;color:var(--muted);text-align:center;padding:32px;gap:10px}
+.empty-img{font-size:52px;opacity:.4}
 
-/* tabs */
-.tabs{display:flex;padding:0 18px;border-bottom:1px solid var(--border);background:var(--s1)}
-.tab{padding:10px 13px;font-size:13px;cursor:pointer;color:var(--muted);border-bottom:2px solid transparent;margin-bottom:-1px;transition:color .15s,border-color .15s;white-space:nowrap}
-.tab.on{color:var(--text);border-bottom-color:var(--accent)}
-.tc{padding:18px}
-.tp{display:none}.tp.on{display:block}
+/* ── Results ── */
+.results-header{padding:20px 22px 0}
+.results-filename{font-weight:700;font-size:17px}
+.results-meta{font-size:13px;color:var(--muted);margin-top:2px}
 
-/* stat grid */
-.sgrid{display:grid;grid-template-columns:repeat(auto-fit,minmax(130px,1fr));gap:10px;margin-bottom:18px}
-.sc{background:var(--s2);border:1px solid var(--border);border-radius:var(--rs);padding:13px}
-.sc-lbl{font-size:10px;color:var(--muted);font-weight:700;text-transform:uppercase;letter-spacing:.5px;margin-bottom:3px}
-.sc-val{font-size:22px;font-weight:700}
-.sc-sub{font-size:11px;color:var(--muted);margin-top:2px}
-.c-red{color:var(--red)}.c-orange{color:var(--orange)}.c-yellow{color:var(--yellow)}.c-green{color:var(--green)}
+/* Summary bar */
+.summary-bar{display:flex;gap:10px;padding:16px 22px;flex-wrap:wrap;border-bottom:1px solid var(--border)}
+.sum-item{display:flex;flex-direction:column;align-items:center;background:var(--light);border:1px solid var(--border);border-radius:10px;padding:12px 18px;min-width:100px;text-align:center}
+.sum-num{font-size:24px;font-weight:800;line-height:1}
+.sum-lbl{font-size:11px;color:var(--muted);margin-top:3px;font-weight:500;text-transform:uppercase;letter-spacing:.4px}
+.sum-num.red{color:var(--red)}.sum-num.orange{color:var(--orange)}.sum-num.yellow{color:var(--yellow)}.sum-num.green{color:var(--green)}
 
-/* ── FINDING CARD ── */
-.fc{background:var(--s2);border:1px solid var(--border);border-radius:var(--rs);margin-bottom:10px;overflow:hidden}
+/* Tabs */
+.tabs{display:flex;padding:0 22px;border-bottom:1px solid var(--border);gap:0}
+.tab{padding:11px 14px;font-size:14px;cursor:pointer;color:var(--muted);border-bottom:2px solid transparent;margin-bottom:-1px;transition:color .15s,border-color .15s;white-space:nowrap;font-weight:500}
+.tab.on{color:var(--blue);border-bottom-color:var(--blue)}
+.tp{display:none;padding:20px 22px}.tp.on{display:block}
 
-/* severity stripe on left */
-.fc-top{display:flex;gap:0;cursor:pointer}
-.fc-top:hover{background:rgba(255,255,255,.015)}
-.sbar{width:4px;flex-shrink:0;border-radius:2px 0 0 0}
-.sbar-Critical{background:var(--red)}
-.sbar-High{background:var(--orange)}
-.sbar-Medium{background:var(--yellow)}
-.sbar-Low{background:var(--green)}
+/* ── Finding cards ── */
+.finding{border:1px solid var(--border);border-radius:10px;margin-bottom:12px;overflow:hidden;background:var(--white)}
+.finding:hover{box-shadow:0 2px 8px rgba(0,0,0,.06)}
 
-.fc-inner{flex:1;padding:13px 14px 13px 12px;display:flex;gap:12px;align-items:flex-start}
+/* Left accent stripe */
+.f-stripe{width:5px;flex-shrink:0;border-radius:3px 0 0 0}
+.s-Critical .f-stripe{background:var(--red)}
+.s-High     .f-stripe{background:var(--orange)}
+.s-Medium   .f-stripe{background:var(--yellow)}
+.s-Low      .f-stripe{background:var(--green)}
 
-/* Location pill — the "where" */
-.where-pill{display:inline-flex;align-items:center;gap:5px;background:var(--s3);border:1px solid var(--border);border-radius:4px;padding:3px 8px;font-size:11px;color:var(--muted);margin-bottom:7px}
-.where-pill .pin{font-size:10px}
+.f-top{display:flex;cursor:pointer;user-select:none}
+.f-top:hover{background:#fafafa}
+.f-body{flex:1;padding:14px 16px 14px 14px}
+
+/* Where pill */
+.where{display:inline-flex;align-items:center;gap:5px;background:var(--light);border:1px solid var(--border);border-radius:6px;padding:3px 10px;font-size:12px;color:var(--muted);margin-bottom:8px;font-weight:500}
+.where-icon{font-size:11px}
 
 /* What was found chips */
-.found-chips{display:flex;flex-wrap:wrap;gap:5px;margin-bottom:7px}
-.found-chip{display:inline-flex;align-items:center;gap:4px;padding:3px 8px;border-radius:4px;font-size:11px;font-weight:600}
-.chip-red   {background:rgba(248,81,73,.12);color:var(--red);border:1px solid rgba(248,81,73,.25)}
-.chip-orange{background:rgba(219,109,40,.1);color:var(--orange);border:1px solid rgba(219,109,40,.25)}
-.chip-yellow{background:rgba(210,153,34,.1);color:var(--yellow);border:1px solid rgba(210,153,34,.25)}
-.chip-blue  {background:rgba(79,129,255,.1);color:#7aa2ff;border:1px solid rgba(79,129,255,.22)}
+.chips{display:flex;flex-wrap:wrap;gap:5px;margin-bottom:8px}
+.chip{display:inline-flex;align-items:center;gap:4px;padding:3px 9px;border-radius:5px;font-size:12px;font-weight:600}
+.chip-red   {background:var(--red-bg);   color:var(--red);   border:1px solid var(--red-border)}
+.chip-orange{background:var(--orange-bg);color:var(--orange);border:1px solid var(--orange-border)}
+.chip-yellow{background:var(--yellow-bg);color:var(--yellow);border:1px solid var(--yellow-border)}
+.chip-green {background:var(--green-bg); color:var(--green); border:1px solid var(--green-border)}
+.chip-blue  {background:#eff6ff;color:#2563eb;border:1px solid #bfdbfe}
 
-.fc-title{font-weight:600;font-size:13px;line-height:1.4;margin-bottom:5px}
-.fc-why{font-size:12px;color:var(--muted);line-height:1.55}
+.f-title{font-weight:700;font-size:14px;margin-bottom:5px;color:var(--text)}
+.f-summary{font-size:13px;color:var(--muted);line-height:1.5}
 
-/* score ring */
-.ring{width:46px;height:46px;border-radius:50%;border:2px solid;display:flex;flex-direction:column;align-items:center;justify-content:center;flex-shrink:0;font-weight:700;font-size:14px}
-.ring-Critical{border-color:var(--red);color:var(--red)}
-.ring-High{border-color:var(--orange);color:var(--orange)}
-.ring-Medium{border-color:var(--yellow);color:var(--yellow)}
-.ring-Low{border-color:var(--green);color:var(--green)}
-.ring sub{font-size:8px;font-weight:400;color:var(--muted)}
+/* Score + severity */
+.f-right{display:flex;flex-direction:column;align-items:center;gap:6px;padding:14px 14px 14px 0;flex-shrink:0}
+.severity-badge{padding:4px 10px;border-radius:20px;font-size:12px;font-weight:700}
+.sv-Critical{background:var(--red-bg);color:var(--red);border:1px solid var(--red-border)}
+.sv-High    {background:var(--orange-bg);color:var(--orange);border:1px solid var(--orange-border)}
+.sv-Medium  {background:var(--yellow-bg);color:var(--yellow);border:1px solid var(--yellow-border)}
+.sv-Low     {background:var(--green-bg);color:var(--green);border:1px solid var(--green-border)}
+.score-ring{width:48px;height:48px;border-radius:50%;border:2.5px solid;display:flex;flex-direction:column;align-items:center;justify-content:center;font-weight:800;font-size:15px}
+.sr-Critical{border-color:var(--red);color:var(--red)}
+.sr-High    {border-color:var(--orange);color:var(--orange)}
+.sr-Medium  {border-color:var(--yellow);color:var(--yellow)}
+.sr-Low     {border-color:var(--green);color:var(--green)}
+.score-label{font-size:8px;font-weight:400;color:var(--muted)}
+.f-chevron{font-size:11px;color:#9ca3af;transition:transform .2s;margin-top:4px}
+.f-chevron.open{transform:rotate(180deg)}
 
-.chev{font-size:10px;color:var(--muted);transition:transform .2s;margin-top:16px;flex-shrink:0}
-.chev.open{transform:rotate(180deg)}
+/* Expanded detail */
+.f-detail{display:none;border-top:1px solid var(--border);padding:16px 18px 16px 19px}
+.f-detail.open{display:block}
+.detail-block{margin-bottom:14px}
+.detail-block:last-child{margin-bottom:0}
+.detail-label{font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.6px;color:var(--muted);margin-bottom:6px}
 
-/* expanded detail */
-.fc-detail{display:none;padding:0 14px 14px 16px;border-top:1px solid var(--border)}
-.fc-detail.open{display:block}
+/* What was found box */
+.found-box{background:#fff8f0;border-left:3px solid var(--orange);border-radius:0 8px 8px 0;padding:11px 14px;font-size:13px;color:var(--text);line-height:1.6}
 
-.dt-section{margin-top:12px}
-.dt-lbl{font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.6px;color:var(--muted);margin-bottom:6px}
-
-/* "What was found" callout box */
-.found-box{background:var(--s3);border-left:3px solid var(--orange);border-radius:0 var(--rs) var(--rs) 0;padding:10px 12px;font-size:12px;color:var(--text);line-height:1.6}
-.found-box strong{color:var(--text)}
+/* Why it matters box */
+.why-box{background:var(--light);border-radius:8px;padding:11px 14px;font-size:13px;color:#374151;line-height:1.6}
 
 /* Action box */
-.action-box{background:rgba(79,129,255,.07);border:1px solid rgba(79,129,255,.2);border-radius:var(--rs);padding:10px 12px;font-size:12px;color:var(--text);line-height:1.6}
-.action-box .action-icon{font-size:15px;float:left;margin-right:8px;margin-top:1px}
+.action-box{background:#f0f9ff;border:1px solid #bae6fd;border-radius:8px;padding:11px 14px;font-size:13px;color:#0369a1;line-height:1.6;display:flex;gap:9px}
+.action-icon{font-size:16px;flex-shrink:0;margin-top:1px}
 
-/* controls */
-.ctl-row{display:flex;flex-wrap:wrap;gap:5px;margin-top:4px}
-.ctl{background:var(--s3);border:1px solid var(--border);border-radius:4px;padding:2px 7px;font-size:11px;color:var(--muted)}
+/* Controls */
+.ctl-row{display:flex;flex-wrap:wrap;gap:5px}
+.ctl{background:var(--light);border:1px solid var(--border);border-radius:5px;padding:3px 8px;font-size:11.5px;color:var(--muted)}
 
-/* gate panel */
-.gate-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:14px}
-.gi{background:var(--s2);border:1px solid var(--border);border-radius:var(--rs);padding:12px 14px}
-.gi-lbl{font-size:10px;text-transform:uppercase;letter-spacing:.4px;color:var(--muted);margin-bottom:3px;font-weight:700}
-.gi-val{font-size:18px;font-weight:700}
-.gate-note{background:var(--s2);border:1px solid var(--border);border-radius:var(--rs);padding:14px;font-size:12px;color:var(--muted);line-height:1.65}
-.gate-note strong{color:var(--text)}
+/* Gate panel */
+.gate-cards{display:grid;grid-template-columns:repeat(auto-fit,minmax(130px,1fr));gap:10px;margin-bottom:16px}
+.gc{background:var(--light);border:1px solid var(--border);border-radius:10px;padding:14px}
+.gc-label{font-size:11px;text-transform:uppercase;letter-spacing:.5px;color:var(--muted);font-weight:700;margin-bottom:4px}
+.gc-value{font-size:17px;font-weight:800}
+.gc-value.green{color:var(--green)}.gc-value.red{color:var(--red)}
+.gate-explain{background:var(--light);border-radius:10px;padding:16px;font-size:13px;color:#374151;line-height:1.65}
+.gate-explain strong{color:var(--text)}
 
-/* outbox */
-.ob-note{background:rgba(63,185,80,.07);border:1px solid rgba(63,185,80,.2);border-radius:var(--rs);padding:9px 13px;font-size:12px;color:var(--green);margin-bottom:10px;display:flex;align-items:center;gap:7px}
-.ob-pre{background:var(--s2);border:1px solid var(--border);border-radius:var(--rs);padding:13px;font-size:11.5px;font-family:"SF Mono","Fira Code",Menlo,monospace;white-space:pre-wrap;word-break:break-all;color:#79b8ff;max-height:360px;overflow-y:auto;line-height:1.5}
+/* Outbox */
+.outbox-safe{background:var(--green-bg);border:1px solid var(--green-border);border-radius:8px;padding:10px 14px;font-size:13px;color:var(--green);margin-bottom:12px;display:flex;align-items:center;gap:8px}
+.outbox-pre{background:#f8fafc;border:1px solid var(--border);border-radius:8px;padding:14px;font-size:12px;font-family:"SF Mono","Fira Code",Menlo,monospace;white-space:pre-wrap;word-break:break-all;color:#334155;max-height:340px;overflow-y:auto;line-height:1.55}
 
-/* timing */
-.trow{display:flex;align-items:center;gap:10px;margin-bottom:8px}
-.tlbl{font-size:12px;color:var(--muted);width:140px;flex-shrink:0;text-transform:capitalize}
-.ttrack{flex:1;height:5px;background:var(--s3);border-radius:3px;overflow:hidden}
-.tfill{height:100%;border-radius:3px;background:var(--accent);transition:width .7s ease}
-.tms{font-size:11px;color:var(--muted);width:52px;text-align:right;flex-shrink:0}
+/* Timing */
+.t-row{display:flex;align-items:center;gap:10px;margin-bottom:9px}
+.t-lbl{font-size:13px;color:var(--muted);width:150px;flex-shrink:0;text-transform:capitalize}
+.t-track{flex:1;height:6px;background:var(--border);border-radius:3px;overflow:hidden}
+.t-fill{height:100%;border-radius:3px;background:var(--blue);transition:width .7s ease}
+.t-ms{font-size:12px;color:var(--muted);width:55px;text-align:right;flex-shrink:0}
 
-/* error */
-.err{background:rgba(248,81,73,.08);border:1px solid rgba(248,81,73,.25);border-radius:var(--rs);padding:9px 12px;color:var(--red);font-size:12px;margin-top:9px}
-
-/* spinner */
-.spin{display:inline-block;width:13px;height:13px;border:2px solid rgba(255,255,255,.25);border-top-color:#fff;border-radius:50%;animation:spin .6s linear infinite}
+/* spin */
+.spin{display:inline-block;width:14px;height:14px;border:2px solid rgba(255,255,255,.3);border-top-color:#fff;border-radius:50%;animation:spin .6s linear infinite}
 @keyframes spin{to{transform:rotate(360deg)}}
 </style>
 </head>
 <body>
 
 <nav>
-  <div class="logo">🛡 <span>TPRM</span> Risk Platform</div>
-  <div class="tag">PRIVATE ZONE</div>
-  <div id="navStatus">Ready</div>
+  <span class="nav-icon">🛡️</span>
+  <span class="nav-title">Vendor Document Checker</span>
+  <span class="nav-sub">— finds sensitive data in third-party documents</span>
+  <div class="nav-right">
+    <div class="nav-dot" id="statusDot"></div>
+    <span id="navStatus">Ready</span>
+  </div>
 </nav>
 
 <div class="page">
 
-  <!-- ── Left panel ── -->
-  <div>
+  <!-- ── Left: upload ── -->
+  <div class="upload-panel">
     <div class="card">
-      <div class="card-hd">New Assessment</div>
-      <div class="card-bd">
-        <div class="drop" id="dz">
-          <input type="file" id="fi" accept=".pdf,.docx,.xlsx">
-          <span class="drop-icon">📋</span>
-          <div class="drop-text">Drop vendor document or <strong>click to browse</strong></div>
-          <div class="drop-hint">PDF · DOCX · XLSX accepted</div>
-          <div class="drop-name" id="fn"></div>
-        </div>
-        <div class="field">
-          <label>Vendor Name / ID</label>
-          <input id="vid" type="text" placeholder="e.g. acme-cloud-services" value="novatech-solutions">
-        </div>
-        <button class="btn" id="sb" disabled onclick="run()">
-          <span id="bi">🔍</span><span id="bt">Analyse Document</span>
-        </button>
-        <div id="eb"></div>
+      <div class="upload-title">Check a vendor document</div>
+      <div class="upload-sub">Upload any vendor-provided PDF, Word doc, or spreadsheet and we'll automatically find sensitive data that shouldn't be there.</div>
+
+      <div class="drop" id="dz">
+        <input type="file" id="fi" accept=".pdf,.docx,.xlsx">
+        <span class="drop-emoji">📄</span>
+        <div class="drop-main">Drop your file here or <span>click to browse</span></div>
+        <div class="drop-hint">PDF, Word (.docx), or Excel (.xlsx)</div>
+        <div class="drop-file" id="fn"></div>
       </div>
+
+      <div class="field">
+        <label>Who sent this document?</label>
+        <input id="vid" type="text" placeholder="e.g. Acme Cloud Services">
+        <div class="field-help">Enter the vendor or company name — used to label the report</div>
+      </div>
+
+      <button class="btn" id="sb" disabled onclick="run()">
+        <span id="bi">🔍</span>
+        <span id="bt">Check This Document</span>
+      </button>
+      <div id="eb"></div>
     </div>
 
-    <div class="card" style="margin-top:13px" id="pc" hidden>
-      <div class="card-hd">Pipeline</div>
-      <div class="card-bd" style="padding-top:10px">
-        <div class="pipe" id="pipe">
-          <div class="ps" id="p-ingestion"><span class="dot"></span><span class="lbl">Parsing &amp; OCR</span><span class="ms" id="m-ingestion"></span></div>
-          <div class="ps" id="p-pii"><span class="dot"></span><span class="lbl">PII detection</span><span class="ms" id="m-pii"></span></div>
-          <div class="ps" id="p-nlp"><span class="dot"></span><span class="lbl">Context analysis</span><span class="ms" id="m-nlp"></span></div>
-          <div class="ps" id="p-policy"><span class="dot"></span><span class="lbl">Sensitivity classification</span><span class="ms" id="m-policy"></span></div>
-          <div class="ps" id="p-sanitize"><span class="dot"></span><span class="lbl">Data sanitisation</span><span class="ms" id="m-sanitize"></span></div>
-          <div class="ps" id="p-gate"><span class="dot"></span><span class="lbl">Security gate</span><span class="ms" id="m-gate"></span></div>
-          <div class="ps" id="p-ai"><span class="dot"></span><span class="lbl">AI risk analysis</span><span class="ms" id="m-ai"></span></div>
-          <div class="ps" id="p-risk"><span class="dot"></span><span class="lbl">Risk scoring</span><span class="ms" id="m-risk"></span></div>
-          <div class="ps" id="p-onetrust"><span class="dot"></span><span class="lbl">Syncing to OneTrust</span><span class="ms" id="m-onetrust"></span></div>
-        </div>
+    <div class="prog-panel" id="pc" hidden>
+      <div class="card">
+        <div class="prog-title">Checking your document</div>
+        <div class="step" id="p-ingestion"><span class="dot"></span><span class="lbl">Reading &amp; scanning pages</span><span class="ms" id="m-ingestion"></span></div>
+        <div class="step" id="p-pii"><span class="dot"></span><span class="lbl">Looking for sensitive data</span><span class="ms" id="m-pii"></span></div>
+        <div class="step" id="p-nlp"><span class="dot"></span><span class="lbl">Understanding context</span><span class="ms" id="m-nlp"></span></div>
+        <div class="step" id="p-policy"><span class="dot"></span><span class="lbl">Classifying risk levels</span><span class="ms" id="m-policy"></span></div>
+        <div class="step" id="p-sanitize"><span class="dot"></span><span class="lbl">Securing sensitive values</span><span class="ms" id="m-sanitize"></span></div>
+        <div class="step" id="p-gate"><span class="dot"></span><span class="lbl">Privacy safety check</span><span class="ms" id="m-gate"></span></div>
+        <div class="step" id="p-ai"><span class="dot"></span><span class="lbl">Analysing security risks</span><span class="ms" id="m-ai"></span></div>
+        <div class="step" id="p-risk"><span class="dot"></span><span class="lbl">Scoring findings</span><span class="ms" id="m-risk"></span></div>
+        <div class="step" id="p-onetrust"><span class="dot"></span><span class="lbl">Saving to your records</span><span class="ms" id="m-onetrust"></span></div>
       </div>
     </div>
   </div>
 
-  <!-- ── Right panel ── -->
+  <!-- ── Right: results ── -->
   <div id="rp">
     <div class="card">
       <div class="empty">
-        <div class="empty-icon">🏢</div>
-        <div style="font-size:14px">No assessment yet</div>
-        <div style="font-size:12px">Upload a vendor document to begin</div>
+        <div class="empty-img">📋</div>
+        <div style="font-size:16px;font-weight:600;color:var(--text)">No document checked yet</div>
+        <div style="font-size:14px;max-width:300px">Upload a vendor document on the left to scan it for sensitive data, security risks, and things that shouldn't be in a shared file.</div>
       </div>
     </div>
   </div>
-
 </div>
 
 <script>
@@ -253,348 +277,325 @@ const STEPS = ['ingestion','pii','nlp','policy','sanitize','gate','ai','risk','o
 let stepIdx = 0, timer = null;
 
 // ── File drop ──────────────────────────────────────────────────────────────
-const fi = document.getElementById('fi');
-const dz = document.getElementById('dz');
-const fn = document.getElementById('fn');
-const sb = document.getElementById('sb');
+const fi=document.getElementById('fi'), dz=document.getElementById('dz'),
+      fn=document.getElementById('fn'), sb=document.getElementById('sb');
 
-fi.addEventListener('change', () => fi.files[0] && setFile(fi.files[0]));
-['dragover','dragenter'].forEach(e => dz.addEventListener(e, ev => { ev.preventDefault(); dz.classList.add('over'); }));
-['dragleave','drop'].forEach(e => dz.addEventListener(e, ev => {
+fi.addEventListener('change', ()=> fi.files[0] && pick(fi.files[0]));
+['dragover','dragenter'].forEach(e=> dz.addEventListener(e, ev=>{ ev.preventDefault(); dz.classList.add('over'); }));
+['dragleave','drop'].forEach(e=> dz.addEventListener(e, ev=>{
   ev.preventDefault(); dz.classList.remove('over');
-  if (e === 'drop' && ev.dataTransfer.files[0]) { fi.files = ev.dataTransfer.files; setFile(ev.dataTransfer.files[0]); }
+  if(e==='drop' && ev.dataTransfer.files[0]){ fi.files=ev.dataTransfer.files; pick(ev.dataTransfer.files[0]); }
 }));
-function setFile(f) { fn.textContent = '📄 ' + f.name; sb.disabled = false; }
+function pick(f){ fn.textContent='✅ '+f.name; sb.disabled=false; }
 
-// ── Pipeline animation ─────────────────────────────────────────────────────
-function resetPipe() {
-  STEPS.forEach(s => { document.getElementById('p-'+s).className='ps'; document.getElementById('m-'+s).textContent=''; });
-  stepIdx = 0;
+// ── Pipeline steps ─────────────────────────────────────────────────────────
+function resetPipe(){
+  STEPS.forEach(s=>{ document.getElementById('p-'+s).className='step'; document.getElementById('m-'+s).textContent=''; });
+  stepIdx=0;
 }
-function nextStep() {
-  if (stepIdx > 0) document.getElementById('p-'+STEPS[stepIdx-1]).className = 'ps done';
-  if (stepIdx < STEPS.length) { document.getElementById('p-'+STEPS[stepIdx]).className = 'ps active'; stepIdx++; }
+function nextStep(){
+  if(stepIdx>0) document.getElementById('p-'+STEPS[stepIdx-1]).className='step done';
+  if(stepIdx<STEPS.length){ document.getElementById('p-'+STEPS[stepIdx]).className='step active'; stepIdx++; }
 }
-function donePipe(timings) {
-  STEPS.forEach(s => {
-    document.getElementById('p-'+s).className = 'ps done';
-    const ms = timings[s] ? Math.round(timings[s]*1000) : null;
-    if (ms) document.getElementById('m-'+s).textContent = ms+'ms';
+function finishSteps(timings){
+  STEPS.forEach(s=>{
+    document.getElementById('p-'+s).className='step done';
+    const ms=timings[s]?Math.round(timings[s]*1000):null;
+    if(ms) document.getElementById('m-'+s).textContent=ms+'ms';
   });
   clearInterval(timer);
 }
 
-// ── Run assessment ─────────────────────────────────────────────────────────
-async function run() {
-  const file   = fi.files[0];
-  const vendor = document.getElementById('vid').value.trim() || 'unknown';
-  if (!file) return;
+// ── Run ────────────────────────────────────────────────────────────────────
+async function run(){
+  const file=fi.files[0];
+  const vendor=document.getElementById('vid').value.trim()||'Unknown Vendor';
+  if(!file) return;
 
-  document.getElementById('eb').innerHTML = '';
-  sb.disabled = true;
-  document.getElementById('bi').innerHTML = '<span class="spin"></span>';
-  document.getElementById('bt').textContent = 'Analysing…';
-  document.getElementById('pc').hidden = false;
-  document.getElementById('navStatus').textContent = 'Running…';
-  document.getElementById('rp').innerHTML = `<div class="card"><div class="empty"><div class="empty-icon" style="animation:pulse .9s infinite">⚙️</div><div>Processing your document…</div><div style="font-size:12px">Usually 5–15 seconds</div></div></div>`;
+  document.getElementById('eb').innerHTML='';
+  sb.disabled=true;
+  document.getElementById('bi').innerHTML='<span class="spin"></span>';
+  document.getElementById('bt').textContent='Checking…';
+  document.getElementById('pc').hidden=false;
+  document.getElementById('navStatus').textContent='Checking…';
+  document.getElementById('statusDot').style.background='#d97706';
+  document.getElementById('rp').innerHTML=`<div class="card"><div class="empty"><div class="empty-img" style="animation:pulse .9s infinite">⏳</div><div style="font-size:16px;font-weight:600;color:var(--text)">Checking your document…</div><div style="font-size:14px;color:var(--muted)">This usually takes 5–15 seconds</div></div></div>`;
 
   resetPipe();
-  timer = setInterval(nextStep, 1400);
+  timer=setInterval(nextStep,1400);
 
-  const fd = new FormData();
-  fd.append('file', file);
-  fd.append('vendor_id', vendor);
+  const fd=new FormData();
+  fd.append('file',file);
+  fd.append('vendor_id',vendor);
 
-  try {
-    const r = await fetch('/api/v1/assessments', { method:'POST', headers:{'X-API-Key':KEY}, body:fd });
+  try{
+    const r=await fetch('/api/v1/assessments',{method:'POST',headers:{'X-API-Key':KEY},body:fd});
     clearInterval(timer);
-    if (!r.ok) { const e = await r.json().catch(()=>({error:r.statusText})); throw new Error(e.error||e.detail||r.statusText); }
-
-    const sum = await r.json();
-    const [dr, fr] = await Promise.all([
-      fetch(`/api/v1/assessments/${sum.assessment_id}`, { headers:{'X-API-Key':KEY} }),
-      fetch(`/api/v1/assessments/${sum.assessment_id}/findings`, { headers:{'X-API-Key':KEY} }),
+    if(!r.ok){
+      const e=await r.json().catch(()=>({error:r.statusText}));
+      throw new Error(e.error||e.detail||'Something went wrong. Please try a different file.');
+    }
+    const sum=await r.json();
+    const [dr,fr]=await Promise.all([
+      fetch(`/api/v1/assessments/${sum.assessment_id}`,{headers:{'X-API-Key':KEY}}),
+      fetch(`/api/v1/assessments/${sum.assessment_id}/findings`,{headers:{'X-API-Key':KEY}}),
     ]);
-    const detail   = await dr.json();
-    const findings = await fr.json();
-
-    donePipe(detail.stage_timings || {});
-    document.getElementById('navStatus').textContent = `Done — ${findings.length} finding${findings.length!==1?'s':''}`;
-    render(sum, detail, findings);
-
-  } catch(e) {
+    const detail=await dr.json(), findings=await fr.json();
+    finishSteps(detail.stage_timings||{});
+    document.getElementById('navStatus').textContent=`Done — ${findings.length} thing${findings.length!==1?'s':''} found`;
+    document.getElementById('statusDot').style.background='var(--green)';
+    render(sum,detail,findings);
+  }catch(e){
     clearInterval(timer);
-    document.getElementById('eb').innerHTML = `<div class="err">⚠️ ${esc(e.message)}</div>`;
-    document.getElementById('rp').innerHTML = `<div class="card"><div class="empty"><div class="empty-icon">⚠️</div><div>${esc(e.message)}</div></div></div>`;
-    document.getElementById('navStatus').textContent = 'Error';
-  } finally {
-    sb.disabled = false;
-    document.getElementById('bi').textContent = '🔍';
-    document.getElementById('bt').textContent = 'Analyse Document';
+    document.getElementById('statusDot').style.background='var(--red)';
+    document.getElementById('navStatus').textContent='Error';
+    document.getElementById('eb').innerHTML=`<div class="err-box">⚠️ <span>${esc(e.message)}</span></div>`;
+    document.getElementById('rp').innerHTML=`<div class="card"><div class="empty"><div class="empty-img">⚠️</div><div style="font-size:15px;font-weight:600;color:var(--text)">Couldn't check this file</div><div style="font-size:13px;color:var(--muted);max-width:280px">${esc(e.message)}</div></div></div>`;
+  }finally{
+    sb.disabled=false;
+    document.getElementById('bi').textContent='🔍';
+    document.getElementById('bt').textContent='Check This Document';
   }
 }
 
-// ── Entity type → display info ────────────────────────────────────────────
-const ENTITY_DISPLAY = {
-  API_KEY:          { label:'API Key / Secret',       color:'chip-red',    icon:'🔑' },
-  PEM_PRIVATE_KEY:  { label:'Private Key',            color:'chip-red',    icon:'🔐' },
-  CREDENTIAL_URL:   { label:'Embedded Credentials',   color:'chip-red',    icon:'🔓' },
-  US_SSN:           { label:'Social Security Number', color:'chip-red',    icon:'🪪' },
-  CREDIT_CARD:      { label:'Payment Card Number',    color:'chip-red',    icon:'💳' },
-  IBAN_CODE:        { label:'Bank Account (IBAN)',     color:'chip-red',    icon:'🏦' },
-  BANK_ACCOUNT:     { label:'Bank Account Number',    color:'chip-red',    icon:'🏦' },
-  EMAIL_ADDRESS:    { label:'Email Address',          color:'chip-orange', icon:'📧' },
-  PHONE_NUMBER:     { label:'Phone Number',           color:'chip-orange', icon:'📞' },
-  PERSON:           { label:'Person Name',            color:'chip-orange', icon:'👤' },
-  IP_ADDRESS:       { label:'Internal IP Address',    color:'chip-yellow', icon:'🌐' },
-  INTERNAL_HOSTNAME:{ label:'Internal Server Name',   color:'chip-yellow', icon:'🖥️' },
-  EMPLOYEE_ID:      { label:'Employee ID',            color:'chip-yellow', icon:'🪪' },
-  CONTRACT_NUMBER:  { label:'Contract Number',        color:'chip-blue',   icon:'📄' },
-  DATE_OF_BIRTH:    { label:'Date of Birth',          color:'chip-red',    icon:'📅' },
-  MAC_ADDRESS:      { label:'Hardware Address (MAC)', color:'chip-yellow', icon:'🔌' },
+// ── Entity → display ──────────────────────────────────────────────────────
+const ETYPES={
+  API_KEY:          {label:'API Key / Secret',       cls:'chip-red',    icon:'🔑'},
+  PEM_PRIVATE_KEY:  {label:'Private Key',            cls:'chip-red',    icon:'🔐'},
+  CREDENTIAL_URL:   {label:'Password in URL',        cls:'chip-red',    icon:'🔓'},
+  US_SSN:           {label:'Social Security Number', cls:'chip-red',    icon:'🪪'},
+  CREDIT_CARD:      {label:'Credit Card Number',     cls:'chip-red',    icon:'💳'},
+  IBAN_CODE:        {label:'Bank Account (IBAN)',     cls:'chip-red',    icon:'🏦'},
+  BANK_ACCOUNT:     {label:'Bank Account',           cls:'chip-red',    icon:'🏦'},
+  EMAIL_ADDRESS:    {label:'Email Address',          cls:'chip-orange', icon:'📧'},
+  PHONE_NUMBER:     {label:'Phone Number',           cls:'chip-orange', icon:'📞'},
+  PERSON:           {label:"Person's Name",          cls:'chip-orange', icon:'👤'},
+  IP_ADDRESS:       {label:'Internal IP Address',    cls:'chip-yellow', icon:'🌐'},
+  INTERNAL_HOSTNAME:{label:'Internal Server Name',   cls:'chip-yellow', icon:'🖥️'},
+  EMPLOYEE_ID:      {label:'Employee ID',            cls:'chip-yellow', icon:'🪪'},
+  DATE_OF_BIRTH:    {label:'Date of Birth',          cls:'chip-red',    icon:'📅'},
+  CONTRACT_NUMBER:  {label:'Contract Number',        cls:'chip-blue',   icon:'📄'},
+  MAC_ADDRESS:      {label:'Network Hardware ID',    cls:'chip-yellow', icon:'🔌'},
 };
-function entityChip(type) {
-  const d = ENTITY_DISPLAY[type] || { label: type.replace(/_/g,' '), color:'chip-blue', icon:'⚠️' };
-  return `<span class="found-chip ${d.color}">${d.icon} ${d.label}</span>`;
+function chip(t){
+  const d=ETYPES[t]||{label:t.replace(/_/g,' '),cls:'chip-blue',icon:'⚠️'};
+  return `<span class="chip ${d.cls}">${d.icon} ${d.label}</span>`;
 }
 
-// ── Severity color ─────────────────────────────────────────────────────────
-const SEV_COLOR = { Critical:'b-red', High:'b-red', Medium:'b-yellow', Low:'b-green' };
-const SEV_BADGE_LABEL = {
-  Critical: '🔴 Critical',
-  High:     '🟠 High',
-  Medium:   '🟡 Medium',
-  Low:      '🟢 Low',
+// ── Severity ──────────────────────────────────────────────────────────────
+const SEV_LABEL={Critical:'🔴 Critical',High:'🟠 High Priority',Medium:'🟡 Medium',Low:'🟢 Low'};
+const SEV_EXPLAIN={
+  Critical:'This is a serious issue that needs immediate attention.',
+  High:'This is a significant risk that should be addressed soon.',
+  Medium:'This issue is worth addressing in your next review cycle.',
+  Low:'This is a minor issue — low urgency but worth noting.',
 };
 
 // ── Render results ─────────────────────────────────────────────────────────
-function render(sum, detail, findings) {
-  const sevOrder = { Critical:4, High:3, Medium:2, Low:1 };
-  findings.sort((a,b) => (sevOrder[b.severity]||0) - (sevOrder[a.severity]||0));
+function render(sum, detail, findings){
+  const sevOrd={Critical:4,High:3,Medium:2,Low:1};
+  findings.sort((a,b)=>(sevOrd[b.severity]||0)-(sevOrd[a.severity]||0));
 
-  const sens = detail.sensitivity;
-  const sensClass = { RESTRICTED:'b-red', CONFIDENTIAL:'b-yellow', INTERNAL:'b-green', PUBLIC:'b-grey' }[sens]||'b-grey';
+  const critN=findings.filter(f=>f.severity==='Critical').length;
+  const highN=findings.filter(f=>f.severity==='High').length;
+  const medN =findings.filter(f=>f.severity==='Medium').length;
+  const lowN =findings.filter(f=>f.severity==='Low').length;
+  const sens=detail.sensitivity;
+  const topScore=findings[0]?.score??0;
 
-  // ── Stats ───────────────────────────────────────────────────────────────
-  const critN = findings.filter(f=>f.severity==='Critical').length;
-  const highN = findings.filter(f=>f.severity==='High').length;
-  const topF  = findings[0];
-  const topColor = {Critical:'c-red',High:'c-orange',Medium:'c-yellow',Low:'c-green'}[topF?.severity]||'c-green';
+  // Sensitivity plain language
+  const sensText={
+    RESTRICTED:'Contains highly sensitive data — handle with care',
+    CONFIDENTIAL:'Contains confidential information',
+    INTERNAL:'Contains some internal information',
+    PUBLIC:'No sensitive data found',
+  }[sens]||sens;
+  const sensColor={RESTRICTED:'red',CONFIDENTIAL:'yellow',INTERNAL:'green',PUBLIC:'green'}[sens]||'green';
 
-  // ── Finding cards ───────────────────────────────────────────────────────
-  function findingCards(fs) {
-    if (!fs.length) return `<div style="text-align:center;padding:40px;color:var(--muted);font-size:13px">✅ No findings identified.</div>`;
+  // ── Finding cards ─────────────────────────────────────────────────────
+  function findingCard(f,i){
+    const etypes=f.entity_types_found||[];
+    const priOrder=['API_KEY','PEM_PRIVATE_KEY','CREDENTIAL_URL','US_SSN','CREDIT_CARD','IBAN_CODE','BANK_ACCOUNT','EMAIL_ADDRESS','PHONE_NUMBER','PERSON','IP_ADDRESS','INTERNAL_HOSTNAME','EMPLOYEE_ID','DATE_OF_BIRTH','CONTRACT_NUMBER'];
+    const sorted=[...etypes].sort((a,b)=>{
+      const ai=priOrder.indexOf(a), bi=priOrder.indexOf(b);
+      return (ai<0?99:ai)-(bi<0?99:bi);
+    });
 
-    return fs.map((f, i) => {
-      const etypes = f.entity_types_found || [];
-      const topPriority = ['API_KEY','PEM_PRIVATE_KEY','CREDENTIAL_URL','US_SSN','CREDIT_CARD','IBAN_CODE','BANK_ACCOUNT','EMAIL_ADDRESS','PHONE_NUMBER','PERSON','IP_ADDRESS','INTERNAL_HOSTNAME','EMPLOYEE_ID','CONTRACT_NUMBER'];
-      const sorted = [...etypes].sort((a,b) => {
-        const ai = topPriority.indexOf(a), bi = topPriority.indexOf(b);
-        return (ai<0?99:ai) - (bi<0?99:bi);
-      });
+    const sl=f.section_label||'';
+    const wherePill=sl?`<div class="where"><span class="where-icon">📍</span>Found in ${esc(sl)}</div>`:'';
+    const chipsHtml=sorted.slice(0,3).map(chip).join('');
+    const moreChips=sorted.length>3?`<span style="font-size:12px;color:var(--muted);align-self:center">+${sorted.length-3} more</span>`:'';
 
-      // Section location pill
-      const sl = f.section_label || '';
-      const whereHtml = sl
-        ? `<div class="where-pill"><span class="pin">📍</span> Found in ${esc(sl)}</div>`
-        : '';
+    const desc=f.description||'';
+    // Split into: sentence 1 (what+where) | sentences 2 (why) | last sentence (action)
+    const sentenceRx=/[^.!?]+[.!?]+/g;
+    const sentences=(desc.match(sentenceRx)||[desc]).map(s=>s.trim()).filter(Boolean);
+    const firstSent=sentences[0]||'';
+    // "Why" = everything between first sentence and last sentence
+    const whyText=sentences.length>2?sentences.slice(1,-1).join(' ').trim():sentences.slice(1).join(' ').trim();
+    // "Action" = last sentence if it starts with an action word
+    const lastSent=sentences[sentences.length-1]||'';
+    const isAction=/^(Ask|Escalate|Notify|Report|Rotate)/i.test(lastSent);
+    const actionText=isAction?lastSent:f.recommendation||'';
+    const displayWhy=whyText||(!isAction?lastSent:'');
 
-      // Entity chips (top 3)
-      const chipsHtml = sorted.slice(0,3).map(entityChip).join('');
-      const foundChipsRow = chipsHtml ? `<div class="found-chips">${chipsHtml}${sorted.length>3?`<span style="font-size:11px;color:var(--muted);align-self:center">+${sorted.length-3} more</span>`:''}</div>` : '';
+    const ctls=(f.controls||[]).slice(0,3);
 
-      // Split description into "what" + "action" parts
-      // Description format: "In [section], we found [what]. [risk_reason] [action]"
-      const desc = f.description || '';
-      // Find the action sentence (starts with "Ask the vendor" or similar action words)
-      const actionMatch = desc.match(/(Ask the vendor[^.]*\.|Escalate immediately[^.]*\.|Notify[^.]*\.)/);
-      const actionText  = actionMatch ? actionMatch[0] : (f.recommendation||'').slice(0,200);
-      // The risk/why part: everything between the found-statement and the action
-      const whyStart = desc.indexOf('. ') + 2;
-      const whyEnd   = actionMatch ? desc.indexOf(actionMatch[0]) : desc.length;
-      const whyText  = whyEnd > whyStart ? desc.slice(whyStart, whyEnd).trim() : '';
-
-      const ctls = (f.controls||[]).slice(0,4);
-
-      return `
-      <div class="fc" id="fc${i}">
-        <div class="fc-top" onclick="toggle(${i})">
-          <div class="sbar sbar-${f.severity}"></div>
-          <div class="fc-inner">
-            <div style="flex:1;min-width:0">
-              ${whereHtml}
-              ${foundChipsRow}
-              <div class="fc-title">${esc(f.title)}</div>
-              <div class="fc-why">${esc(whyText.slice(0,130))}${whyText.length>130?'…':''}</div>
-            </div>
-            <div style="display:flex;flex-direction:column;align-items:center;gap:4px;flex-shrink:0">
-              <div class="ring ring-${f.severity}">${f.score}<sub>/100</sub></div>
-              <span class="b ${SEV_COLOR[f.severity]||'b-grey'}" style="font-size:10px">${f.severity}</span>
-            </div>
-            <div class="chev" id="chev${i}">▼</div>
-          </div>
+    return `
+    <div class="finding s-${f.severity}">
+      <div class="f-top" onclick="tog(${i})">
+        <div class="f-stripe"></div>
+        <div class="f-body">
+          ${wherePill}
+          ${chipsHtml?`<div class="chips">${chipsHtml}${moreChips}</div>`:''}
+          <div class="f-title">${esc(f.title)}</div>
+          <div class="f-summary">${esc((displayWhy||firstSent).slice(0,120))}${(displayWhy||firstSent).length>120?'…':''}</div>
         </div>
-        <div class="fc-detail" id="fd${i}">
-          ${whereHtml ? `
-          <div class="dt-section">
-            <div class="dt-lbl">What was found</div>
-            <div class="found-box">
-              ${sorted.length ? `<div style="margin-bottom:6px">${sorted.slice(0,4).map(entityChip).join(' ')}</div>` : ''}
-              ${esc(desc.slice(0, desc.indexOf('. ')+1) || desc.slice(0,180))}
-            </div>
-          </div>` : ''}
-          ${whyText ? `
-          <div class="dt-section">
-            <div class="dt-lbl">Why this is a problem</div>
-            <div style="font-size:12px;color:var(--muted);line-height:1.6">${esc(whyText)}</div>
-          </div>` : ''}
-          ${actionText ? `
-          <div class="dt-section">
-            <div class="dt-lbl">What to do</div>
-            <div class="action-box"><span class="action-icon">✉️</span>${esc(actionText)}</div>
-          </div>` : ''}
-          ${ctls.length ? `
-          <div class="dt-section">
-            <div class="dt-lbl">Relevant security standards</div>
-            <div class="ctl-row">${ctls.map(c=>`<span class="ctl">${esc(c.framework)} ${esc(c.ref)} — ${esc(c.name)}</span>`).join('')}</div>
-          </div>` : ''}
+        <div class="f-right">
+          <div class="score-ring sr-${f.severity}">${f.score}<div class="score-label">/ 100</div></div>
+          <span class="severity-badge sv-${f.severity}">${SEV_LABEL[f.severity]||f.severity}</span>
+          <div class="f-chevron" id="chev${i}">▼</div>
         </div>
-      </div>`;
-    }).join('');
+      </div>
+      <div class="f-detail" id="fd${i}">
+        ${firstSent?`
+        <div class="detail-block">
+          <div class="detail-label">What was found</div>
+          <div class="found-box">${sorted.length?`<div style="margin-bottom:6px">${sorted.slice(0,4).map(chip).join(' ')}</div>`:''}${esc(firstSent)}</div>
+        </div>`:''}
+        ${displayWhy?`
+        <div class="detail-block">
+          <div class="detail-label">Why this matters</div>
+          <div class="why-box">${esc(displayWhy)}</div>
+        </div>`:''}
+        ${actionText?`
+        <div class="detail-block">
+          <div class="detail-label">What you should do</div>
+          <div class="action-box"><span class="action-icon">✉️</span><span>${esc(actionText)}</span></div>
+        </div>`:''}
+        ${ctls.length?`
+        <div class="detail-block">
+          <div class="detail-label">Related security standards</div>
+          <div class="ctl-row">${ctls.map(c=>`<span class="ctl">${esc(c.framework)} — ${esc(c.name)}</span>`).join('')}</div>
+        </div>`:''}
+      </div>
+    </div>`;
   }
 
-  // ── Outbox payload ──────────────────────────────────────────────────────
-  const outbox = JSON.stringify({
-    source: 'TPRM-Pipeline',
+  const allCards=findings.length
+    ? findings.map(findingCard).join('')
+    : `<div style="text-align:center;padding:40px;color:var(--muted)">✅ No issues found in this document.</div>`;
+
+  // Outbox payload
+  const outbox=JSON.stringify({
+    vendor: detail.vendor_id,
     assessment_id: sum.assessment_id,
-    vendor_id: detail.vendor_id,
-    document_sensitivity: sens,
-    gate_passed: true,
-    total_findings: findings.length,
-    findings: findings.map(f => ({
-      id: f.id,
+    sensitivity: sens,
+    total_issues: findings.length,
+    issues: findings.map(f=>({
       title: f.title,
       severity: f.severity,
-      risk_score: f.score,
-      category: f.risk_category,
-      section: f.section_label || 'unknown',
+      score: f.score,
+      found_in: f.section_label||'unknown',
+      data_types: f.entity_types_found||[],
       status: f.status,
-      controls: (f.controls||[]).map(c => `${c.framework} ${c.ref}`),
-      note: 'All personal data redacted/tokenised by Security Gate — no raw PII in this payload',
     }))
-  }, null, 2);
+  },null,2);
 
-  // ── Timing bars ─────────────────────────────────────────────────────────
-  const timings = detail.stage_timings || {};
-  const maxMs = Math.max(...Object.values(timings).map(v=>v*1000), 1);
-  const timingHtml = Object.entries(timings).map(([k,v]) => {
-    const ms = Math.round(v*1000);
-    const pct = Math.max(2, Math.round(ms/maxMs*100));
-    const lbl = k.replace(/_/g,' ').replace(/\b\w/g,c=>c.toUpperCase());
-    return `<div class="trow"><div class="tlbl">${esc(lbl)}</div><div class="ttrack"><div class="tfill" style="width:${pct}%"></div></div><div class="tms">${ms} ms</div></div>`;
+  // Timing bars
+  const timings=detail.stage_timings||{};
+  const stageNames={'ingestion':'Reading pages','pii':'Finding PII','nlp':'Understanding context','policy':'Classifying risk','sanitization':'Securing data','gate':'Privacy gate','ai_analysis':'Risk analysis','risk_engine':'Scoring'};
+  const maxMs=Math.max(...Object.values(timings).map(v=>v*1000),1);
+  const timingHtml=Object.entries(timings).map(([k,v])=>{
+    const ms=Math.round(v*1000), pct=Math.max(2,Math.round(ms/maxMs*100));
+    return `<div class="t-row"><div class="t-lbl">${esc(stageNames[k]||k.replace(/_/g,' '))}</div><div class="t-track"><div class="t-fill" style="width:${pct}%"></div></div><div class="t-ms">${ms}ms</div></div>`;
   }).join('');
 
-  const cards = findingCards(findings);
-
-  document.getElementById('rp').innerHTML = `
+  document.getElementById('rp').innerHTML=`
   <div class="card">
-    <div class="ah">
-      <div>
-        <div class="ah-title">${esc(detail.filename||'Vendor Document')}</div>
-        <div class="ah-meta">Vendor: <strong>${esc(detail.vendor_id)}</strong> &nbsp;·&nbsp; <code style="font-size:11px;color:var(--muted)">${esc(sum.assessment_id.slice(0,8))}…</code></div>
+    <div class="results-header">
+      <div class="results-filename">📄 ${esc(detail.filename||'Vendor Document')}</div>
+      <div class="results-meta" style="margin-bottom:14px">Submitted by <strong>${esc(detail.vendor_id)}</strong> &nbsp;·&nbsp; ${new Date().toLocaleDateString('en-GB',{day:'numeric',month:'long',year:'numeric'})}</div>
+    </div>
+
+    <div class="summary-bar">
+      <div class="sum-item">
+        <div class="sum-num ${sensColor}">${sens}</div>
+        <div class="sum-lbl">Sensitivity</div>
       </div>
-      <div class="badges">
-        <span class="b ${sensClass}">${sens}</span>
-        <span class="b b-green">✓ Gate Passed</span>
-        <span class="b b-grey">${findings.length} finding${findings.length!==1?'s':''}</span>
+      <div class="sum-item">
+        <div class="sum-num ${critN+highN>0?'red':'green'}">${critN+highN}</div>
+        <div class="sum-lbl">Urgent issues</div>
+      </div>
+      <div class="sum-item">
+        <div class="sum-num ${medN>0?'yellow':'green'}">${medN}</div>
+        <div class="sum-lbl">Medium issues</div>
+      </div>
+      <div class="sum-item">
+        <div class="sum-num green">${lowN}</div>
+        <div class="sum-lbl">Minor issues</div>
+      </div>
+      <div class="sum-item">
+        <div class="sum-num ${topScore>50?'red':topScore>25?'orange':'green'}">${topScore}</div>
+        <div class="sum-lbl">Top risk score</div>
       </div>
     </div>
 
     <div class="tabs">
-      <div class="tab on"  onclick="stab('overview',this)">Overview</div>
-      <div class="tab"     onclick="stab('findings',this)">Findings (${findings.length})</div>
-      <div class="tab"     onclick="stab('gate',this)">Privacy Gate</div>
-      <div class="tab"     onclick="stab('outbox',this)">OneTrust Sync</div>
+      <div class="tab on"  onclick="stab('issues',this)">Issues Found (${findings.length})</div>
+      <div class="tab"     onclick="stab('privacy',this)">Privacy Check</div>
+      <div class="tab"     onclick="stab('report',this)">Full Report</div>
       <div class="tab"     onclick="stab('timing',this)">Performance</div>
     </div>
 
-    <div class="tc">
+    <div class="tp on" id="t-issues">
+      ${findings.length ? `<p style="font-size:13px;color:var(--muted);margin-bottom:14px">Click any issue to see full details and what to do.</p>` : ''}
+      ${allCards}
+    </div>
 
-      <div class="tp on" id="t-overview">
-        <div class="sgrid">
-          <div class="sc">
-            <div class="sc-lbl">Top Risk Score</div>
-            <div class="sc-val ${topColor}">${topF?.score??0}</div>
-            <div class="sc-sub">out of 100</div>
-          </div>
-          <div class="sc">
-            <div class="sc-lbl">Critical / High</div>
-            <div class="sc-val ${critN+highN>0?'c-red':'c-green'}">${critN+highN}</div>
-            <div class="sc-sub">${critN} critical, ${highN} high</div>
-          </div>
-          <div class="sc">
-            <div class="sc-lbl">Sensitivity</div>
-            <div class="sc-val" style="font-size:14px;padding-top:4px">${sens}</div>
-            <div class="sc-sub">Document level</div>
-          </div>
-          <div class="sc">
-            <div class="sc-lbl">Workflow</div>
-            <div class="sc-val" style="font-size:14px;padding-top:4px">${esc(detail.workflow_status)}</div>
-            <div class="sc-sub">Current state</div>
-          </div>
-        </div>
-        <div style="font-size:11px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.6px;margin-bottom:10px">Findings</div>
-        ${cards}
+    <div class="tp" id="t-privacy">
+      <div class="gate-cards">
+        <div class="gc"><div class="gc-label">Privacy Check</div><div class="gc-value green">✓ Passed</div></div>
+        <div class="gc"><div class="gc-label">Data Sensitivity</div><div class="gc-value">${sens}</div></div>
+        <div class="gc"><div class="gc-label">Data Leaked to AI</div><div class="gc-value green">None</div></div>
+        <div class="gc"><div class="gc-label">Raw PII in Report</div><div class="gc-value green">None</div></div>
       </div>
-
-      <div class="tp" id="t-findings">${cards}</div>
-
-      <div class="tp" id="t-gate">
-        <div class="gate-grid">
-          <div class="gi"><div class="gi-lbl">Status</div><div class="gi-val" style="color:var(--green)">✓ Passed</div></div>
-          <div class="gi"><div class="gi-lbl">Sensitivity</div><div class="gi-val" style="font-size:15px;padding-top:3px">${sens}</div></div>
-          <div class="gi"><div class="gi-lbl">PII Leaked to AI</div><div class="gi-val" style="color:var(--green)">0</div></div>
-          <div class="gi"><div class="gi-lbl">Re-scans Triggered</div><div class="gi-val">${detail.stage_timings?.gate?'✓ Done':'—'}</div></div>
-        </div>
-        <div class="gate-note">
-          <strong>How the Security Gate works</strong><br><br>
-          Every block of text from your document is scanned twice — once by the PII detector,
-          and again independently by the Security Gate before anything reaches the AI engine.<br><br>
-          The Gate checks for residual personal data, validates that all sensitive values have been
-          properly redacted or tokenised, and ensures no high-entropy strings (API keys, passwords)
-          are present in the output.<br><br>
-          Only after passing all checks is the payload signed and forwarded. The AI engine verifies
-          this cryptographic signature on every call — it is architecturally impossible to pass raw
-          personal data to the AI without it being detected and blocked.
-        </div>
+      <div class="gate-explain">
+        <strong>How your data was protected</strong><br><br>
+        When you uploaded this document, every piece of sensitive information was automatically
+        detected and masked before it was analysed. Names, emails, phone numbers, passwords,
+        and other personal data were replaced with tokens — meaning the AI never saw any raw
+        personal information.<br><br>
+        A privacy gate independently verified there were no leaks before the analysis began.
+        The report you're reading contains only risk findings — no raw personal data from the
+        original document appears here or anywhere in the system.
       </div>
+    </div>
 
-      <div class="tp" id="t-outbox">
-        <div class="ob-note">🔒 No personal data in this payload — all PII was redacted or tokenised before the Security Gate.</div>
-        <pre class="ob-pre">${esc(outbox)}</pre>
-      </div>
+    <div class="tp" id="t-report">
+      <div class="outbox-safe">✅ This report contains no raw personal data — all sensitive values were masked.</div>
+      <pre class="outbox-pre">${esc(outbox)}</pre>
+    </div>
 
-      <div class="tp" id="t-timing">
-        <div style="font-size:12px;color:var(--muted);margin-bottom:14px">Time spent per pipeline stage</div>
-        ${timingHtml||'<div style="color:var(--muted)">No timing data.</div>'}
-      </div>
-
+    <div class="tp" id="t-timing">
+      <p style="font-size:13px;color:var(--muted);margin-bottom:14px">Time taken for each analysis step</p>
+      ${timingHtml||'<div style="color:var(--muted)">No timing data.</div>'}
     </div>
   </div>`;
 }
 
 // ── Helpers ────────────────────────────────────────────────────────────────
-function stab(n, el) {
+function stab(n,el){
   document.querySelectorAll('.tab').forEach(t=>t.classList.remove('on'));
   document.querySelectorAll('.tp').forEach(p=>p.classList.remove('on'));
   el.classList.add('on');
   document.getElementById('t-'+n).classList.add('on');
 }
-function toggle(i) {
+function tog(i){
   document.getElementById('fd'+i).classList.toggle('open');
   document.getElementById('chev'+i).classList.toggle('open');
 }
-function esc(s) {
+function esc(s){
   return String(s??'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
 }
 </script>
