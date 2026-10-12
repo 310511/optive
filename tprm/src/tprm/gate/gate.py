@@ -111,11 +111,18 @@ def process(
         raise GateViolation(f"Gate re-scan failed: {exc}") from exc
 
     if rescan_hits > 0:
-        _quarantine(doc_id, "rescan_found_pii", f"{rescan_hits} residual PII entities detected", audit)
-        raise GateViolation(
-            f"Gate re-scan detected {rescan_hits} residual PII entities in sanitized output. "
-            "Document quarantined."
-        )
+        # Per spec: re-route to sanitization once, then re-scan
+        log.warning("gate_rescan_hit_rerouting", hits=rescan_hits, doc_id=doc_id)
+        sanitized_blocks = _auto_sanitize_residual(blocks, gate_thresholds, default_threshold)
+        rescan_hits2 = _rescan_blocks(sanitized_blocks, gate_thresholds, default_threshold)
+        report.rerouted_blocks = 1
+        if rescan_hits2 > 0:
+            _quarantine(doc_id, "rescan_found_pii_after_reroute", f"{rescan_hits2} residual entities remain after re-sanitization", audit)
+            raise GateViolation(
+                f"Gate re-scan detected {rescan_hits2} residual PII entities after re-sanitization. "
+                "Document quarantined."
+            )
+        blocks = sanitized_blocks
 
     # ── Step 2: Vault lookup ──────────────────────────────────────────────────
     if raw_values_for_check:
@@ -349,6 +356,51 @@ def _check_entropy(
                         f"High-entropy string detected in gate output (entropy={entropy:.2f} > {threshold}). "
                         "Potential key material. Block quarantined."
                     )
+
+
+def _auto_sanitize_residual(
+    blocks: list[SanitizedBlock],
+    thresholds: dict[str, float],
+    default_threshold: float,
+) -> list[SanitizedBlock]:
+    """Emergency sanitization pass: redact any PII found by the gate re-scan.
+
+    Replaces residual PII spans with [REDACTED:<TYPE>] placeholders.
+    Applied right-to-left to preserve offset correctness.
+    """
+    analyzer = _get_gate_analyzer()
+    if analyzer is None:
+        return blocks
+
+    result: list[SanitizedBlock] = []
+    for block in blocks:
+        text = block.text_sanitized
+        clean = _PLACEHOLDER_SCAN.sub("[PLACEHOLDER]", text)
+
+        try:
+            hits = analyzer.analyze(text=clean, language="en", score_threshold=default_threshold)
+        except Exception:
+            hits = []
+
+        if not hits:
+            result.append(block)
+            continue
+
+        # Apply redactions right-to-left on the original text
+        # (using same offsets since we only stripped placeholders, not shifted)
+        spans = sorted(
+            [(r.start, r.end, r.entity_type) for r in hits
+             if r.score >= thresholds.get(r.entity_type, default_threshold)],
+            key=lambda s: s[0],
+            reverse=True,
+        )
+        patched = text
+        for start, end, entity_type in spans:
+            patched = patched[:start] + f"[REDACTED:{entity_type}]" + patched[end:]
+
+        result.append(block.model_copy(update={"text_sanitized": patched}))
+
+    return result
 
 
 def _quarantine(

@@ -337,6 +337,8 @@ class Finding(BaseModel):
     created_at: datetime = Field(default_factory=datetime.utcnow)
     title: str = ""
     description: str = ""
+    section_label: str = ""    # e.g. '"Access Management"' or 'Encryption & Key Management section'
+    entity_types_found: list[str] = Field(default_factory=list)  # e.g. ["API_KEY", "EMAIL_ADDRESS"]
 
     def __repr__(self) -> str:  # noqa: D105
         return (

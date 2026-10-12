@@ -104,6 +104,10 @@ async def get_findings(
             "score": f.score,
             "risk_category": f.risk_category,
             "title": f.title,
+            "description": f.description,
+            "section_label": f.section_label,
+            "entity_types_found": f.entity_types_found,
+            "recommendation": f.recommendation,
             "status": f.status,
             "controls": [c.model_dump() for c in f.controls],
         }

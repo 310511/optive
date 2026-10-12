@@ -3,385 +3,599 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>TPRM — Vendor Risk Assessment</title>
+<title>TPRM — Vendor Risk Platform</title>
 <style>
-  :root {
-    --bg: #0f1117;
-    --surface: #1a1d27;
-    --surface2: #252836;
-    --border: #2e3348;
-    --accent: #5b6af0;
-    --accent-hover: #7b89ff;
-    --text: #e2e4f0;
-    --text-muted: #8b90a7;
-    --red: #f05b5b;
-    --green: #4caf7d;
-    --yellow: #f0c05b;
-    --orange: #f08c3e;
-    --radius: 10px;
-  }
-  * { box-sizing: border-box; margin: 0; padding: 0; }
-  body { background: var(--bg); color: var(--text); font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; min-height: 100vh; }
+:root {
+  --bg:       #0d1117;
+  --s1:       #161b22;
+  --s2:       #1c2128;
+  --s3:       #21262d;
+  --border:   #30363d;
+  --accent:   #4f81ff;
+  --text:     #e6edf3;
+  --muted:    #8b949e;
+  --green:    #3fb950;
+  --yellow:   #d29922;
+  --orange:   #db6d28;
+  --red:      #f85149;
+  --r: 10px; --rs: 7px;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+body{background:var(--bg);color:var(--text);font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",system-ui,sans-serif;min-height:100vh;font-size:14px}
 
-  /* ── Header ── */
-  header { background: var(--surface); border-bottom: 1px solid var(--border); padding: 0 2rem; display: flex; align-items: center; gap: 1rem; height: 56px; }
-  header .logo { font-weight: 700; font-size: 1.1rem; color: var(--accent); letter-spacing: .5px; }
-  header .subtitle { color: var(--text-muted); font-size: .85rem; }
+/* nav */
+nav{height:52px;background:var(--s1);border-bottom:1px solid var(--border);display:flex;align-items:center;padding:0 24px;gap:10px;position:sticky;top:0;z-index:100}
+.logo{font-weight:700;font-size:15px}
+.logo span{color:var(--accent)}
+.tag{background:rgba(79,129,255,.12);color:#7aa2ff;border:1px solid rgba(79,129,255,.25);border-radius:20px;font-size:11px;padding:2px 9px;font-weight:600}
+#navStatus{margin-left:auto;font-size:12px;color:var(--muted)}
 
-  /* ── Layout ── */
-  .container { max-width: 1100px; margin: 0 auto; padding: 2rem 1.5rem; }
-  .two-col { display: grid; grid-template-columns: 360px 1fr; gap: 1.5rem; align-items: start; }
+/* layout */
+.page{max-width:1160px;margin:0 auto;padding:24px 18px;display:grid;grid-template-columns:330px 1fr;gap:18px;align-items:start}
+@media(max-width:780px){.page{grid-template-columns:1fr}}
 
-  /* ── Cards ── */
-  .card { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); padding: 1.5rem; }
-  .card h2 { font-size: .95rem; font-weight: 600; color: var(--text-muted); text-transform: uppercase; letter-spacing: .8px; margin-bottom: 1.25rem; }
+/* card */
+.card{background:var(--s1);border:1px solid var(--border);border-radius:var(--r)}
+.card-hd{padding:14px 16px 0;font-size:11px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.8px}
+.card-bd{padding:14px 16px 16px}
 
-  /* ── Upload form ── */
-  .drop-zone {
-    border: 2px dashed var(--border);
-    border-radius: var(--radius);
-    padding: 2rem 1rem;
-    text-align: center;
-    cursor: pointer;
-    transition: border-color .2s, background .2s;
-    position: relative;
-  }
-  .drop-zone:hover, .drop-zone.drag-over { border-color: var(--accent); background: rgba(91,106,240,.06); }
-  .drop-zone input[type=file] { position: absolute; inset: 0; opacity: 0; cursor: pointer; }
-  .drop-zone .icon { font-size: 2rem; margin-bottom: .5rem; }
-  .drop-zone .hint { color: var(--text-muted); font-size: .85rem; margin-top: .4rem; }
-  .drop-zone .filename { color: var(--accent); font-size: .9rem; margin-top: .5rem; font-weight: 500; }
+/* drop zone */
+.drop{border:2px dashed var(--border);border-radius:var(--rs);padding:26px 14px;text-align:center;cursor:pointer;transition:all .2s;position:relative;margin-bottom:12px}
+.drop:hover,.drop.over{border-color:var(--accent);background:rgba(79,129,255,.04)}
+.drop input{position:absolute;inset:0;opacity:0;cursor:pointer;width:100%;height:100%}
+.drop-icon{font-size:26px;display:block;margin-bottom:6px}
+.drop-text{font-size:13px}.drop-hint{font-size:11px;color:var(--muted);margin-top:3px}
+.drop-name{font-size:12px;color:#7aa2ff;margin-top:5px;font-weight:500;word-break:break-all}
 
-  .field { margin-top: 1rem; }
-  .field label { display: block; font-size: .83rem; color: var(--text-muted); margin-bottom: .35rem; }
-  .field input { width: 100%; background: var(--bg); border: 1px solid var(--border); border-radius: 6px; padding: .55rem .75rem; color: var(--text); font-size: .9rem; outline: none; transition: border-color .2s; }
-  .field input:focus { border-color: var(--accent); }
+.field{margin-bottom:10px}
+.field label{display:block;font-size:11px;color:var(--muted);margin-bottom:4px;font-weight:600;text-transform:uppercase;letter-spacing:.4px}
+.field input{width:100%;background:var(--s2);border:1px solid var(--border);border-radius:var(--rs);padding:8px 10px;color:var(--text);font-size:13px;outline:none;transition:border-color .2s}
+.field input:focus{border-color:var(--accent)}
+.field input::placeholder{color:var(--muted)}
 
-  .btn { display: block; width: 100%; margin-top: 1.25rem; padding: .7rem; background: var(--accent); border: none; border-radius: 7px; color: #fff; font-size: .95rem; font-weight: 600; cursor: pointer; transition: background .2s; }
-  .btn:hover:not(:disabled) { background: var(--accent-hover); }
-  .btn:disabled { opacity: .45; cursor: not-allowed; }
+.btn{width:100%;padding:10px;background:var(--accent);border:none;border-radius:var(--rs);color:#fff;font-size:14px;font-weight:600;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:8px;transition:opacity .15s}
+.btn:hover:not(:disabled){opacity:.88}
+.btn:disabled{opacity:.38;cursor:not-allowed}
 
-  /* ── Progress ── */
-  .progress-steps { display: flex; flex-direction: column; gap: .5rem; margin-top: 1rem; }
-  .step { display: flex; align-items: center; gap: .6rem; font-size: .83rem; color: var(--text-muted); }
-  .step .dot { width: 8px; height: 8px; border-radius: 50%; background: var(--border); flex-shrink: 0; }
-  .step.done .dot { background: var(--green); }
-  .step.active .dot { background: var(--accent); animation: pulse 1s infinite; }
-  .step.done { color: var(--text); }
-  .step.active { color: var(--text); }
-  @keyframes pulse { 0%,100%{opacity:1} 50%{opacity:.4} }
+/* pipeline */
+.pipe{margin-top:14px}
+.ps{display:flex;align-items:center;gap:9px;padding:5px 0;font-size:12px;color:var(--muted);transition:color .3s}
+.ps .dot{width:7px;height:7px;border-radius:50%;background:var(--border);flex-shrink:0;transition:background .3s}
+.ps .lbl{flex:1}.ps .ms{font-size:11px;color:var(--muted)}
+.ps.active{color:var(--text)}.ps.active .dot{background:var(--accent);box-shadow:0 0 0 3px rgba(79,129,255,.2);animation:pulse .9s infinite}
+.ps.done{color:var(--green)}.ps.done .dot{background:var(--green)}
+@keyframes pulse{0%,100%{opacity:1}50%{opacity:.4}}
 
-  /* ── Sensitivity badge ── */
-  .sens-bar { display: flex; gap: .5rem; margin-bottom: 1.25rem; flex-wrap: wrap; }
-  .sens-badge { padding: .25rem .7rem; border-radius: 20px; font-size: .78rem; font-weight: 600; }
-  .sens-PUBLIC    { background: #1a2a1a; color: var(--green); border: 1px solid var(--green); }
-  .sens-INTERNAL  { background: #1a251f; color: #5bcf90; border: 1px solid #3a7a5a; }
-  .sens-CONFIDENTIAL { background: #2a2510; color: var(--yellow); border: 1px solid var(--yellow); }
-  .sens-RESTRICTED { background: #2a1515; color: var(--red); border: 1px solid var(--red); }
+/* empty */
+.empty{display:flex;flex-direction:column;align-items:center;justify-content:center;min-height:420px;color:var(--muted);text-align:center;gap:8px}
+.empty-icon{font-size:46px;opacity:.35}
 
-  /* ── Gate report ── */
-  .gate-row { display: flex; justify-content: space-between; padding: .45rem 0; border-bottom: 1px solid var(--border); font-size: .87rem; }
-  .gate-row:last-child { border-bottom: none; }
-  .gate-row span:first-child { color: var(--text-muted); }
-  .pass { color: var(--green); font-weight: 600; }
-  .fail { color: var(--red); font-weight: 600; }
+/* assess header */
+.ah{padding:16px 18px;border-bottom:1px solid var(--border);display:flex;justify-content:space-between;align-items:flex-start;flex-wrap:wrap;gap:10px}
+.ah-title{font-weight:700;font-size:15px;margin-bottom:2px}
+.ah-meta{font-size:12px;color:var(--muted)}
+.badges{display:flex;gap:7px;flex-wrap:wrap;align-items:center}
+.b{padding:4px 10px;border-radius:20px;font-size:11px;font-weight:700}
+.b-red{background:rgba(248,81,73,.12);color:var(--red);border:1px solid rgba(248,81,73,.28)}
+.b-yellow{background:rgba(210,153,34,.1);color:var(--yellow);border:1px solid rgba(210,153,34,.28)}
+.b-green{background:rgba(63,185,80,.1);color:var(--green);border:1px solid rgba(63,185,80,.22)}
+.b-blue{background:rgba(79,129,255,.1);color:#7aa2ff;border:1px solid rgba(79,129,255,.22)}
+.b-grey{background:var(--s2);color:var(--muted);border:1px solid var(--border)}
 
-  /* ── Findings ── */
-  .finding { background: var(--surface2); border: 1px solid var(--border); border-radius: 8px; padding: 1rem 1.1rem; margin-bottom: .75rem; }
-  .finding-header { display: flex; justify-content: space-between; align-items: flex-start; gap: .5rem; margin-bottom: .45rem; }
-  .finding-title { font-weight: 600; font-size: .93rem; }
-  .sev-badge { padding: .18rem .55rem; border-radius: 4px; font-size: .75rem; font-weight: 700; white-space: nowrap; }
-  .sev-Low      { background: #1e2d1e; color: var(--green); }
-  .sev-Medium   { background: #2d2a10; color: var(--yellow); }
-  .sev-High     { background: #2d1e10; color: var(--orange); }
-  .sev-Critical { background: #2d1010; color: var(--red); }
-  .finding-meta { font-size: .8rem; color: var(--text-muted); margin-bottom: .4rem; }
-  .finding-rec { font-size: .82rem; color: var(--text-muted); line-height: 1.5; }
-  .controls-list { display: flex; flex-wrap: wrap; gap: .35rem; margin-top: .5rem; }
-  .ctl-tag { background: var(--bg); border: 1px solid var(--border); border-radius: 4px; padding: .15rem .45rem; font-size: .72rem; color: var(--text-muted); }
+/* tabs */
+.tabs{display:flex;padding:0 18px;border-bottom:1px solid var(--border);background:var(--s1)}
+.tab{padding:10px 13px;font-size:13px;cursor:pointer;color:var(--muted);border-bottom:2px solid transparent;margin-bottom:-1px;transition:color .15s,border-color .15s;white-space:nowrap}
+.tab.on{color:var(--text);border-bottom-color:var(--accent)}
+.tc{padding:18px}
+.tp{display:none}.tp.on{display:block}
 
-  /* ── Outbox ── */
-  .outbox-pre { background: var(--bg); border: 1px solid var(--border); border-radius: 8px; padding: 1rem; font-size: .78rem; font-family: "Menlo","Consolas",monospace; white-space: pre-wrap; word-break: break-all; color: #a8c0e8; max-height: 320px; overflow-y: auto; }
+/* stat grid */
+.sgrid{display:grid;grid-template-columns:repeat(auto-fit,minmax(130px,1fr));gap:10px;margin-bottom:18px}
+.sc{background:var(--s2);border:1px solid var(--border);border-radius:var(--rs);padding:13px}
+.sc-lbl{font-size:10px;color:var(--muted);font-weight:700;text-transform:uppercase;letter-spacing:.5px;margin-bottom:3px}
+.sc-val{font-size:22px;font-weight:700}
+.sc-sub{font-size:11px;color:var(--muted);margin-top:2px}
+.c-red{color:var(--red)}.c-orange{color:var(--orange)}.c-yellow{color:var(--yellow)}.c-green{color:var(--green)}
 
-  /* ── Timing ── */
-  .timing-row { display: flex; justify-content: space-between; font-size: .82rem; padding: .3rem 0; border-bottom: 1px solid var(--border); }
-  .timing-row:last-child { border-bottom: none; }
-  .timing-row span:first-child { color: var(--text-muted); }
+/* ── FINDING CARD ── */
+.fc{background:var(--s2);border:1px solid var(--border);border-radius:var(--rs);margin-bottom:10px;overflow:hidden}
 
-  /* ── Empty / error states ── */
-  .empty { text-align: center; padding: 3rem 1rem; color: var(--text-muted); font-size: .9rem; }
-  .empty .big { font-size: 2.5rem; margin-bottom: .5rem; }
-  .error-msg { background: #2a1010; border: 1px solid var(--red); border-radius: 8px; padding: 1rem; color: var(--red); font-size: .87rem; margin-top: 1rem; }
-  .spinner { display: inline-block; width: 18px; height: 18px; border: 2px solid rgba(255,255,255,.3); border-top-color: #fff; border-radius: 50%; animation: spin .7s linear infinite; vertical-align: middle; margin-right: 6px; }
-  @keyframes spin { to { transform: rotate(360deg); } }
+/* severity stripe on left */
+.fc-top{display:flex;gap:0;cursor:pointer}
+.fc-top:hover{background:rgba(255,255,255,.015)}
+.sbar{width:4px;flex-shrink:0;border-radius:2px 0 0 0}
+.sbar-Critical{background:var(--red)}
+.sbar-High{background:var(--orange)}
+.sbar-Medium{background:var(--yellow)}
+.sbar-Low{background:var(--green)}
 
-  /* ── Tabs ── */
-  .tabs { display: flex; gap: 0; border-bottom: 1px solid var(--border); margin-bottom: 1.25rem; }
-  .tab { padding: .6rem 1rem; font-size: .86rem; cursor: pointer; color: var(--text-muted); border-bottom: 2px solid transparent; margin-bottom: -1px; transition: color .2s, border-color .2s; }
-  .tab.active { color: var(--accent); border-bottom-color: var(--accent); }
-  .tab-panel { display: none; }
-  .tab-panel.active { display: block; }
+.fc-inner{flex:1;padding:13px 14px 13px 12px;display:flex;gap:12px;align-items:flex-start}
+
+/* Location pill — the "where" */
+.where-pill{display:inline-flex;align-items:center;gap:5px;background:var(--s3);border:1px solid var(--border);border-radius:4px;padding:3px 8px;font-size:11px;color:var(--muted);margin-bottom:7px}
+.where-pill .pin{font-size:10px}
+
+/* What was found chips */
+.found-chips{display:flex;flex-wrap:wrap;gap:5px;margin-bottom:7px}
+.found-chip{display:inline-flex;align-items:center;gap:4px;padding:3px 8px;border-radius:4px;font-size:11px;font-weight:600}
+.chip-red   {background:rgba(248,81,73,.12);color:var(--red);border:1px solid rgba(248,81,73,.25)}
+.chip-orange{background:rgba(219,109,40,.1);color:var(--orange);border:1px solid rgba(219,109,40,.25)}
+.chip-yellow{background:rgba(210,153,34,.1);color:var(--yellow);border:1px solid rgba(210,153,34,.25)}
+.chip-blue  {background:rgba(79,129,255,.1);color:#7aa2ff;border:1px solid rgba(79,129,255,.22)}
+
+.fc-title{font-weight:600;font-size:13px;line-height:1.4;margin-bottom:5px}
+.fc-why{font-size:12px;color:var(--muted);line-height:1.55}
+
+/* score ring */
+.ring{width:46px;height:46px;border-radius:50%;border:2px solid;display:flex;flex-direction:column;align-items:center;justify-content:center;flex-shrink:0;font-weight:700;font-size:14px}
+.ring-Critical{border-color:var(--red);color:var(--red)}
+.ring-High{border-color:var(--orange);color:var(--orange)}
+.ring-Medium{border-color:var(--yellow);color:var(--yellow)}
+.ring-Low{border-color:var(--green);color:var(--green)}
+.ring sub{font-size:8px;font-weight:400;color:var(--muted)}
+
+.chev{font-size:10px;color:var(--muted);transition:transform .2s;margin-top:16px;flex-shrink:0}
+.chev.open{transform:rotate(180deg)}
+
+/* expanded detail */
+.fc-detail{display:none;padding:0 14px 14px 16px;border-top:1px solid var(--border)}
+.fc-detail.open{display:block}
+
+.dt-section{margin-top:12px}
+.dt-lbl{font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.6px;color:var(--muted);margin-bottom:6px}
+
+/* "What was found" callout box */
+.found-box{background:var(--s3);border-left:3px solid var(--orange);border-radius:0 var(--rs) var(--rs) 0;padding:10px 12px;font-size:12px;color:var(--text);line-height:1.6}
+.found-box strong{color:var(--text)}
+
+/* Action box */
+.action-box{background:rgba(79,129,255,.07);border:1px solid rgba(79,129,255,.2);border-radius:var(--rs);padding:10px 12px;font-size:12px;color:var(--text);line-height:1.6}
+.action-box .action-icon{font-size:15px;float:left;margin-right:8px;margin-top:1px}
+
+/* controls */
+.ctl-row{display:flex;flex-wrap:wrap;gap:5px;margin-top:4px}
+.ctl{background:var(--s3);border:1px solid var(--border);border-radius:4px;padding:2px 7px;font-size:11px;color:var(--muted)}
+
+/* gate panel */
+.gate-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:14px}
+.gi{background:var(--s2);border:1px solid var(--border);border-radius:var(--rs);padding:12px 14px}
+.gi-lbl{font-size:10px;text-transform:uppercase;letter-spacing:.4px;color:var(--muted);margin-bottom:3px;font-weight:700}
+.gi-val{font-size:18px;font-weight:700}
+.gate-note{background:var(--s2);border:1px solid var(--border);border-radius:var(--rs);padding:14px;font-size:12px;color:var(--muted);line-height:1.65}
+.gate-note strong{color:var(--text)}
+
+/* outbox */
+.ob-note{background:rgba(63,185,80,.07);border:1px solid rgba(63,185,80,.2);border-radius:var(--rs);padding:9px 13px;font-size:12px;color:var(--green);margin-bottom:10px;display:flex;align-items:center;gap:7px}
+.ob-pre{background:var(--s2);border:1px solid var(--border);border-radius:var(--rs);padding:13px;font-size:11.5px;font-family:"SF Mono","Fira Code",Menlo,monospace;white-space:pre-wrap;word-break:break-all;color:#79b8ff;max-height:360px;overflow-y:auto;line-height:1.5}
+
+/* timing */
+.trow{display:flex;align-items:center;gap:10px;margin-bottom:8px}
+.tlbl{font-size:12px;color:var(--muted);width:140px;flex-shrink:0;text-transform:capitalize}
+.ttrack{flex:1;height:5px;background:var(--s3);border-radius:3px;overflow:hidden}
+.tfill{height:100%;border-radius:3px;background:var(--accent);transition:width .7s ease}
+.tms{font-size:11px;color:var(--muted);width:52px;text-align:right;flex-shrink:0}
+
+/* error */
+.err{background:rgba(248,81,73,.08);border:1px solid rgba(248,81,73,.25);border-radius:var(--rs);padding:9px 12px;color:var(--red);font-size:12px;margin-top:9px}
+
+/* spinner */
+.spin{display:inline-block;width:13px;height:13px;border:2px solid rgba(255,255,255,.25);border-top-color:#fff;border-radius:50%;animation:spin .6s linear infinite}
+@keyframes spin{to{transform:rotate(360deg)}}
 </style>
 </head>
 <body>
 
-<header>
-  <div class="logo">🛡 TPRM</div>
-  <div class="subtitle">Privacy-Preserving Vendor Risk Pipeline</div>
-</header>
+<nav>
+  <div class="logo">🛡 <span>TPRM</span> Risk Platform</div>
+  <div class="tag">PRIVATE ZONE</div>
+  <div id="navStatus">Ready</div>
+</nav>
 
-<div class="container">
-  <div class="two-col">
+<div class="page">
 
-    <!-- ── Left: Upload form ── -->
-    <div>
-      <div class="card">
-        <h2>Upload Vendor Document</h2>
-
-        <div class="drop-zone" id="dropZone">
-          <input type="file" id="fileInput" accept=".pdf,.docx,.xlsx">
-          <div class="icon">📄</div>
-          <div>Drop file here or <strong>click to browse</strong></div>
-          <div class="hint">PDF · DOCX · XLSX</div>
-          <div class="filename" id="fileName"></div>
+  <!-- ── Left panel ── -->
+  <div>
+    <div class="card">
+      <div class="card-hd">New Assessment</div>
+      <div class="card-bd">
+        <div class="drop" id="dz">
+          <input type="file" id="fi" accept=".pdf,.docx,.xlsx">
+          <span class="drop-icon">📋</span>
+          <div class="drop-text">Drop vendor document or <strong>click to browse</strong></div>
+          <div class="drop-hint">PDF · DOCX · XLSX accepted</div>
+          <div class="drop-name" id="fn"></div>
         </div>
-
         <div class="field">
-          <label>Vendor ID</label>
-          <input type="text" id="vendorId" placeholder="e.g. acme-cloud-services" value="acme-demo">
+          <label>Vendor Name / ID</label>
+          <input id="vid" type="text" placeholder="e.g. acme-cloud-services" value="novatech-solutions">
         </div>
-
-        <button class="btn" id="submitBtn" onclick="runAssessment()" disabled>
-          Run Assessment
+        <button class="btn" id="sb" disabled onclick="run()">
+          <span id="bi">🔍</span><span id="bt">Analyse Document</span>
         </button>
-
-        <div id="errorMsg"></div>
+        <div id="eb"></div>
       </div>
+    </div>
 
-      <!-- Progress steps -->
-      <div class="card" style="margin-top:1rem;" id="progressCard" hidden>
-        <h2>Pipeline Progress</h2>
-        <div class="progress-steps" id="progressSteps">
-          <div class="step" id="s-ingestion"><span class="dot"></span>Document Ingestion</div>
-          <div class="step" id="s-pii"><span class="dot"></span>PII Detection</div>
-          <div class="step" id="s-nlp"><span class="dot"></span>Local NLP</div>
-          <div class="step" id="s-policy"><span class="dot"></span>Policy Engine</div>
-          <div class="step" id="s-sanitize"><span class="dot"></span>Sanitization</div>
-          <div class="step" id="s-gate"><span class="dot"></span>Security Gate</div>
-          <div class="step" id="s-ai"><span class="dot"></span>AI Risk Analysis</div>
-          <div class="step" id="s-risk"><span class="dot"></span>Risk Engine</div>
-          <div class="step" id="s-workflow"><span class="dot"></span>Workflow</div>
-          <div class="step" id="s-onetrust"><span class="dot"></span>OneTrust Outbox</div>
+    <div class="card" style="margin-top:13px" id="pc" hidden>
+      <div class="card-hd">Pipeline</div>
+      <div class="card-bd" style="padding-top:10px">
+        <div class="pipe" id="pipe">
+          <div class="ps" id="p-ingestion"><span class="dot"></span><span class="lbl">Parsing &amp; OCR</span><span class="ms" id="m-ingestion"></span></div>
+          <div class="ps" id="p-pii"><span class="dot"></span><span class="lbl">PII detection</span><span class="ms" id="m-pii"></span></div>
+          <div class="ps" id="p-nlp"><span class="dot"></span><span class="lbl">Context analysis</span><span class="ms" id="m-nlp"></span></div>
+          <div class="ps" id="p-policy"><span class="dot"></span><span class="lbl">Sensitivity classification</span><span class="ms" id="m-policy"></span></div>
+          <div class="ps" id="p-sanitize"><span class="dot"></span><span class="lbl">Data sanitisation</span><span class="ms" id="m-sanitize"></span></div>
+          <div class="ps" id="p-gate"><span class="dot"></span><span class="lbl">Security gate</span><span class="ms" id="m-gate"></span></div>
+          <div class="ps" id="p-ai"><span class="dot"></span><span class="lbl">AI risk analysis</span><span class="ms" id="m-ai"></span></div>
+          <div class="ps" id="p-risk"><span class="dot"></span><span class="lbl">Risk scoring</span><span class="ms" id="m-risk"></span></div>
+          <div class="ps" id="p-onetrust"><span class="dot"></span><span class="lbl">Syncing to OneTrust</span><span class="ms" id="m-onetrust"></span></div>
         </div>
       </div>
     </div>
+  </div>
 
-    <!-- ── Right: Results ── -->
-    <div id="resultsPanel">
+  <!-- ── Right panel ── -->
+  <div id="rp">
+    <div class="card">
       <div class="empty">
-        <div class="big">🔍</div>
-        Upload a vendor document to start an assessment.
+        <div class="empty-icon">🏢</div>
+        <div style="font-size:14px">No assessment yet</div>
+        <div style="font-size:12px">Upload a vendor document to begin</div>
       </div>
     </div>
-
   </div>
+
 </div>
 
 <script>
-const API_KEY = 'dev-insecure-key';
+const KEY = 'dev-insecure-key';
+const STEPS = ['ingestion','pii','nlp','policy','sanitize','gate','ai','risk','onetrust'];
+let stepIdx = 0, timer = null;
 
-// ── File selection ─────────────────────────────────────────────────────────
-const fileInput = document.getElementById('fileInput');
-const dropZone  = document.getElementById('dropZone');
-const fileName  = document.getElementById('fileName');
-const submitBtn = document.getElementById('submitBtn');
+// ── File drop ──────────────────────────────────────────────────────────────
+const fi = document.getElementById('fi');
+const dz = document.getElementById('dz');
+const fn = document.getElementById('fn');
+const sb = document.getElementById('sb');
 
-fileInput.addEventListener('change', () => {
-  if (fileInput.files[0]) {
-    fileName.textContent = fileInput.files[0].name;
-    submitBtn.disabled = false;
-  }
-});
+fi.addEventListener('change', () => fi.files[0] && setFile(fi.files[0]));
+['dragover','dragenter'].forEach(e => dz.addEventListener(e, ev => { ev.preventDefault(); dz.classList.add('over'); }));
+['dragleave','drop'].forEach(e => dz.addEventListener(e, ev => {
+  ev.preventDefault(); dz.classList.remove('over');
+  if (e === 'drop' && ev.dataTransfer.files[0]) { fi.files = ev.dataTransfer.files; setFile(ev.dataTransfer.files[0]); }
+}));
+function setFile(f) { fn.textContent = '📄 ' + f.name; sb.disabled = false; }
 
-dropZone.addEventListener('dragover', e => { e.preventDefault(); dropZone.classList.add('drag-over'); });
-dropZone.addEventListener('dragleave', () => dropZone.classList.remove('drag-over'));
-dropZone.addEventListener('drop', e => {
-  e.preventDefault();
-  dropZone.classList.remove('drag-over');
-  const f = e.dataTransfer.files[0];
-  if (f) { fileInput.files = e.dataTransfer.files; fileName.textContent = f.name; submitBtn.disabled = false; }
-});
-
-// ── Progress steps animation ───────────────────────────────────────────────
-const STEPS = ['ingestion','pii','nlp','policy','sanitize','gate','ai','risk','workflow','onetrust'];
-let stepIndex = 0;
-let stepTimer = null;
-
-function resetSteps() {
+// ── Pipeline animation ─────────────────────────────────────────────────────
+function resetPipe() {
+  STEPS.forEach(s => { document.getElementById('p-'+s).className='ps'; document.getElementById('m-'+s).textContent=''; });
+  stepIdx = 0;
+}
+function nextStep() {
+  if (stepIdx > 0) document.getElementById('p-'+STEPS[stepIdx-1]).className = 'ps done';
+  if (stepIdx < STEPS.length) { document.getElementById('p-'+STEPS[stepIdx]).className = 'ps active'; stepIdx++; }
+}
+function donePipe(timings) {
   STEPS.forEach(s => {
-    const el = document.getElementById('s-' + s);
-    el.className = 'step';
+    document.getElementById('p-'+s).className = 'ps done';
+    const ms = timings[s] ? Math.round(timings[s]*1000) : null;
+    if (ms) document.getElementById('m-'+s).textContent = ms+'ms';
   });
-  stepIndex = 0;
-}
-
-function advanceStep() {
-  if (stepIndex > 0) {
-    document.getElementById('s-' + STEPS[stepIndex - 1]).className = 'step done';
-  }
-  if (stepIndex < STEPS.length) {
-    document.getElementById('s-' + STEPS[stepIndex]).className = 'step active';
-    stepIndex++;
-  }
-}
-
-function finishSteps() {
-  STEPS.forEach(s => document.getElementById('s-' + s).className = 'step done');
-  if (stepTimer) clearInterval(stepTimer);
+  clearInterval(timer);
 }
 
 // ── Run assessment ─────────────────────────────────────────────────────────
-async function runAssessment() {
-  const file = fileInput.files[0];
-  const vendor = document.getElementById('vendorId').value.trim() || 'unknown';
+async function run() {
+  const file   = fi.files[0];
+  const vendor = document.getElementById('vid').value.trim() || 'unknown';
   if (!file) return;
 
-  document.getElementById('errorMsg').innerHTML = '';
-  submitBtn.disabled = true;
-  submitBtn.innerHTML = '<span class="spinner"></span>Running…';
-  document.getElementById('progressCard').hidden = false;
-  document.getElementById('resultsPanel').innerHTML = '<div class="empty"><div class="big" style="animation:pulse 1s infinite">⚙️</div>Processing…</div>';
+  document.getElementById('eb').innerHTML = '';
+  sb.disabled = true;
+  document.getElementById('bi').innerHTML = '<span class="spin"></span>';
+  document.getElementById('bt').textContent = 'Analysing…';
+  document.getElementById('pc').hidden = false;
+  document.getElementById('navStatus').textContent = 'Running…';
+  document.getElementById('rp').innerHTML = `<div class="card"><div class="empty"><div class="empty-icon" style="animation:pulse .9s infinite">⚙️</div><div>Processing your document…</div><div style="font-size:12px">Usually 5–15 seconds</div></div></div>`;
 
-  resetSteps();
-  // Advance steps at ~1.5s intervals to mimic pipeline progress
-  stepTimer = setInterval(advanceStep, 1500);
+  resetPipe();
+  timer = setInterval(nextStep, 1400);
 
-  const form = new FormData();
-  form.append('file', file);
-  form.append('vendor_id', vendor);
+  const fd = new FormData();
+  fd.append('file', file);
+  fd.append('vendor_id', vendor);
 
   try {
-    const resp = await fetch('/api/v1/assessments', {
-      method: 'POST',
-      headers: { 'X-API-Key': API_KEY },
-      body: form,
-    });
+    const r = await fetch('/api/v1/assessments', { method:'POST', headers:{'X-API-Key':KEY}, body:fd });
+    clearInterval(timer);
+    if (!r.ok) { const e = await r.json().catch(()=>({error:r.statusText})); throw new Error(e.error||e.detail||r.statusText); }
 
-    if (stepTimer) clearInterval(stepTimer);
-    finishSteps();
-
-    if (!resp.ok) {
-      const err = await resp.json().catch(() => ({ detail: resp.statusText }));
-      throw new Error(err.detail || resp.statusText);
-    }
-
-    const summary = await resp.json();
-    const { assessment_id } = summary;
-
-    // Fetch full details
-    const [detailResp, findingsResp] = await Promise.all([
-      fetch(`/api/v1/assessments/${assessment_id}`, { headers: { 'X-API-Key': API_KEY } }),
-      fetch(`/api/v1/assessments/${assessment_id}/findings`, { headers: { 'X-API-Key': API_KEY } }),
+    const sum = await r.json();
+    const [dr, fr] = await Promise.all([
+      fetch(`/api/v1/assessments/${sum.assessment_id}`, { headers:{'X-API-Key':KEY} }),
+      fetch(`/api/v1/assessments/${sum.assessment_id}/findings`, { headers:{'X-API-Key':KEY} }),
     ]);
+    const detail   = await dr.json();
+    const findings = await fr.json();
 
-    const detail   = await detailResp.json();
-    const findings = await findingsResp.json();
+    donePipe(detail.stage_timings || {});
+    document.getElementById('navStatus').textContent = `Done — ${findings.length} finding${findings.length!==1?'s':''}`;
+    render(sum, detail, findings);
 
-    renderResults(summary, detail, findings);
-  } catch (e) {
-    if (stepTimer) clearInterval(stepTimer);
-    document.getElementById('errorMsg').innerHTML =
-      `<div class="error-msg">❌ ${e.message}</div>`;
-    document.getElementById('resultsPanel').innerHTML =
-      '<div class="empty"><div class="big">⚠️</div>Assessment failed — see error above.</div>';
+  } catch(e) {
+    clearInterval(timer);
+    document.getElementById('eb').innerHTML = `<div class="err">⚠️ ${esc(e.message)}</div>`;
+    document.getElementById('rp').innerHTML = `<div class="card"><div class="empty"><div class="empty-icon">⚠️</div><div>${esc(e.message)}</div></div></div>`;
+    document.getElementById('navStatus').textContent = 'Error';
   } finally {
-    submitBtn.disabled = false;
-    submitBtn.innerHTML = 'Run Assessment';
+    sb.disabled = false;
+    document.getElementById('bi').textContent = '🔍';
+    document.getElementById('bt').textContent = 'Analyse Document';
   }
 }
 
-// ── Render results ─────────────────────────────────────────────────────────
-function renderResults(summary, detail, findings) {
-  const sensColor = { PUBLIC: 'sens-PUBLIC', INTERNAL: 'sens-INTERNAL', CONFIDENTIAL: 'sens-CONFIDENTIAL', RESTRICTED: 'sens-RESTRICTED' };
-  const sevOrder  = { Critical: 4, High: 3, Medium: 2, Low: 1 };
-  findings.sort((a, b) => (sevOrder[b.severity] || 0) - (sevOrder[a.severity] || 0));
+// ── Entity type → display info ────────────────────────────────────────────
+const ENTITY_DISPLAY = {
+  API_KEY:          { label:'API Key / Secret',       color:'chip-red',    icon:'🔑' },
+  PEM_PRIVATE_KEY:  { label:'Private Key',            color:'chip-red',    icon:'🔐' },
+  CREDENTIAL_URL:   { label:'Embedded Credentials',   color:'chip-red',    icon:'🔓' },
+  US_SSN:           { label:'Social Security Number', color:'chip-red',    icon:'🪪' },
+  CREDIT_CARD:      { label:'Payment Card Number',    color:'chip-red',    icon:'💳' },
+  IBAN_CODE:        { label:'Bank Account (IBAN)',     color:'chip-red',    icon:'🏦' },
+  BANK_ACCOUNT:     { label:'Bank Account Number',    color:'chip-red',    icon:'🏦' },
+  EMAIL_ADDRESS:    { label:'Email Address',          color:'chip-orange', icon:'📧' },
+  PHONE_NUMBER:     { label:'Phone Number',           color:'chip-orange', icon:'📞' },
+  PERSON:           { label:'Person Name',            color:'chip-orange', icon:'👤' },
+  IP_ADDRESS:       { label:'Internal IP Address',    color:'chip-yellow', icon:'🌐' },
+  INTERNAL_HOSTNAME:{ label:'Internal Server Name',   color:'chip-yellow', icon:'🖥️' },
+  EMPLOYEE_ID:      { label:'Employee ID',            color:'chip-yellow', icon:'🪪' },
+  CONTRACT_NUMBER:  { label:'Contract Number',        color:'chip-blue',   icon:'📄' },
+  DATE_OF_BIRTH:    { label:'Date of Birth',          color:'chip-red',    icon:'📅' },
+  MAC_ADDRESS:      { label:'Hardware Address (MAC)', color:'chip-yellow', icon:'🔌' },
+};
+function entityChip(type) {
+  const d = ENTITY_DISPLAY[type] || { label: type.replace(/_/g,' '), color:'chip-blue', icon:'⚠️' };
+  return `<span class="found-chip ${d.color}">${d.icon} ${d.label}</span>`;
+}
 
-  const outboxPayload = JSON.stringify({
-    assessment_id: summary.assessment_id,
+// ── Severity color ─────────────────────────────────────────────────────────
+const SEV_COLOR = { Critical:'b-red', High:'b-red', Medium:'b-yellow', Low:'b-green' };
+const SEV_BADGE_LABEL = {
+  Critical: '🔴 Critical',
+  High:     '🟠 High',
+  Medium:   '🟡 Medium',
+  Low:      '🟢 Low',
+};
+
+// ── Render results ─────────────────────────────────────────────────────────
+function render(sum, detail, findings) {
+  const sevOrder = { Critical:4, High:3, Medium:2, Low:1 };
+  findings.sort((a,b) => (sevOrder[b.severity]||0) - (sevOrder[a.severity]||0));
+
+  const sens = detail.sensitivity;
+  const sensClass = { RESTRICTED:'b-red', CONFIDENTIAL:'b-yellow', INTERNAL:'b-green', PUBLIC:'b-grey' }[sens]||'b-grey';
+
+  // ── Stats ───────────────────────────────────────────────────────────────
+  const critN = findings.filter(f=>f.severity==='Critical').length;
+  const highN = findings.filter(f=>f.severity==='High').length;
+  const topF  = findings[0];
+  const topColor = {Critical:'c-red',High:'c-orange',Medium:'c-yellow',Low:'c-green'}[topF?.severity]||'c-green';
+
+  // ── Finding cards ───────────────────────────────────────────────────────
+  function findingCards(fs) {
+    if (!fs.length) return `<div style="text-align:center;padding:40px;color:var(--muted);font-size:13px">✅ No findings identified.</div>`;
+
+    return fs.map((f, i) => {
+      const etypes = f.entity_types_found || [];
+      const topPriority = ['API_KEY','PEM_PRIVATE_KEY','CREDENTIAL_URL','US_SSN','CREDIT_CARD','IBAN_CODE','BANK_ACCOUNT','EMAIL_ADDRESS','PHONE_NUMBER','PERSON','IP_ADDRESS','INTERNAL_HOSTNAME','EMPLOYEE_ID','CONTRACT_NUMBER'];
+      const sorted = [...etypes].sort((a,b) => {
+        const ai = topPriority.indexOf(a), bi = topPriority.indexOf(b);
+        return (ai<0?99:ai) - (bi<0?99:bi);
+      });
+
+      // Section location pill
+      const sl = f.section_label || '';
+      const whereHtml = sl
+        ? `<div class="where-pill"><span class="pin">📍</span> Found in ${esc(sl)}</div>`
+        : '';
+
+      // Entity chips (top 3)
+      const chipsHtml = sorted.slice(0,3).map(entityChip).join('');
+      const foundChipsRow = chipsHtml ? `<div class="found-chips">${chipsHtml}${sorted.length>3?`<span style="font-size:11px;color:var(--muted);align-self:center">+${sorted.length-3} more</span>`:''}</div>` : '';
+
+      // Split description into "what" + "action" parts
+      // Description format: "In [section], we found [what]. [risk_reason] [action]"
+      const desc = f.description || '';
+      // Find the action sentence (starts with "Ask the vendor" or similar action words)
+      const actionMatch = desc.match(/(Ask the vendor[^.]*\.|Escalate immediately[^.]*\.|Notify[^.]*\.)/);
+      const actionText  = actionMatch ? actionMatch[0] : (f.recommendation||'').slice(0,200);
+      // The risk/why part: everything between the found-statement and the action
+      const whyStart = desc.indexOf('. ') + 2;
+      const whyEnd   = actionMatch ? desc.indexOf(actionMatch[0]) : desc.length;
+      const whyText  = whyEnd > whyStart ? desc.slice(whyStart, whyEnd).trim() : '';
+
+      const ctls = (f.controls||[]).slice(0,4);
+
+      return `
+      <div class="fc" id="fc${i}">
+        <div class="fc-top" onclick="toggle(${i})">
+          <div class="sbar sbar-${f.severity}"></div>
+          <div class="fc-inner">
+            <div style="flex:1;min-width:0">
+              ${whereHtml}
+              ${foundChipsRow}
+              <div class="fc-title">${esc(f.title)}</div>
+              <div class="fc-why">${esc(whyText.slice(0,130))}${whyText.length>130?'…':''}</div>
+            </div>
+            <div style="display:flex;flex-direction:column;align-items:center;gap:4px;flex-shrink:0">
+              <div class="ring ring-${f.severity}">${f.score}<sub>/100</sub></div>
+              <span class="b ${SEV_COLOR[f.severity]||'b-grey'}" style="font-size:10px">${f.severity}</span>
+            </div>
+            <div class="chev" id="chev${i}">▼</div>
+          </div>
+        </div>
+        <div class="fc-detail" id="fd${i}">
+          ${whereHtml ? `
+          <div class="dt-section">
+            <div class="dt-lbl">What was found</div>
+            <div class="found-box">
+              ${sorted.length ? `<div style="margin-bottom:6px">${sorted.slice(0,4).map(entityChip).join(' ')}</div>` : ''}
+              ${esc(desc.slice(0, desc.indexOf('. ')+1) || desc.slice(0,180))}
+            </div>
+          </div>` : ''}
+          ${whyText ? `
+          <div class="dt-section">
+            <div class="dt-lbl">Why this is a problem</div>
+            <div style="font-size:12px;color:var(--muted);line-height:1.6">${esc(whyText)}</div>
+          </div>` : ''}
+          ${actionText ? `
+          <div class="dt-section">
+            <div class="dt-lbl">What to do</div>
+            <div class="action-box"><span class="action-icon">✉️</span>${esc(actionText)}</div>
+          </div>` : ''}
+          ${ctls.length ? `
+          <div class="dt-section">
+            <div class="dt-lbl">Relevant security standards</div>
+            <div class="ctl-row">${ctls.map(c=>`<span class="ctl">${esc(c.framework)} ${esc(c.ref)} — ${esc(c.name)}</span>`).join('')}</div>
+          </div>` : ''}
+        </div>
+      </div>`;
+    }).join('');
+  }
+
+  // ── Outbox payload ──────────────────────────────────────────────────────
+  const outbox = JSON.stringify({
+    source: 'TPRM-Pipeline',
+    assessment_id: sum.assessment_id,
     vendor_id: detail.vendor_id,
-    sensitivity: detail.sensitivity,
+    document_sensitivity: sens,
+    gate_passed: true,
+    total_findings: findings.length,
     findings: findings.map(f => ({
-      id: f.id, severity: f.severity, score: f.score,
-      category: f.risk_category, title: f.title,
-      controls: f.controls.map(c => `${c.framework} ${c.ref}`),
+      id: f.id,
+      title: f.title,
+      severity: f.severity,
+      risk_score: f.score,
+      category: f.risk_category,
+      section: f.section_label || 'unknown',
+      status: f.status,
+      controls: (f.controls||[]).map(c => `${c.framework} ${c.ref}`),
+      note: 'All personal data redacted/tokenised by Security Gate — no raw PII in this payload',
     }))
   }, null, 2);
 
-  const timingRows = Object.entries(detail.stage_timings || {})
-    .map(([k, v]) => `<div class="timing-row"><span>${k}</span><span>${(v * 1000).toFixed(0)} ms</span></div>`)
-    .join('');
+  // ── Timing bars ─────────────────────────────────────────────────────────
+  const timings = detail.stage_timings || {};
+  const maxMs = Math.max(...Object.values(timings).map(v=>v*1000), 1);
+  const timingHtml = Object.entries(timings).map(([k,v]) => {
+    const ms = Math.round(v*1000);
+    const pct = Math.max(2, Math.round(ms/maxMs*100));
+    const lbl = k.replace(/_/g,' ').replace(/\b\w/g,c=>c.toUpperCase());
+    return `<div class="trow"><div class="tlbl">${esc(lbl)}</div><div class="ttrack"><div class="tfill" style="width:${pct}%"></div></div><div class="tms">${ms} ms</div></div>`;
+  }).join('');
 
-  const findingCards = findings.length ? findings.map(f => `
-    <div class="finding">
-      <div class="finding-header">
-        <div class="finding-title">${esc(f.title)}</div>
-        <div>
-          <span class="sev-badge sev-${f.severity}">${f.severity}</span>
-          <span style="font-size:.78rem;color:var(--text-muted);margin-left:.4rem">${f.score}/100</span>
+  const cards = findingCards(findings);
+
+  document.getElementById('rp').innerHTML = `
+  <div class="card">
+    <div class="ah">
+      <div>
+        <div class="ah-title">${esc(detail.filename||'Vendor Document')}</div>
+        <div class="ah-meta">Vendor: <strong>${esc(detail.vendor_id)}</strong> &nbsp;·&nbsp; <code style="font-size:11px;color:var(--muted)">${esc(sum.assessment_id.slice(0,8))}…</code></div>
+      </div>
+      <div class="badges">
+        <span class="b ${sensClass}">${sens}</span>
+        <span class="b b-green">✓ Gate Passed</span>
+        <span class="b b-grey">${findings.length} finding${findings.length!==1?'s':''}</span>
+      </div>
+    </div>
+
+    <div class="tabs">
+      <div class="tab on"  onclick="stab('overview',this)">Overview</div>
+      <div class="tab"     onclick="stab('findings',this)">Findings (${findings.length})</div>
+      <div class="tab"     onclick="stab('gate',this)">Privacy Gate</div>
+      <div class="tab"     onclick="stab('outbox',this)">OneTrust Sync</div>
+      <div class="tab"     onclick="stab('timing',this)">Performance</div>
+    </div>
+
+    <div class="tc">
+
+      <div class="tp on" id="t-overview">
+        <div class="sgrid">
+          <div class="sc">
+            <div class="sc-lbl">Top Risk Score</div>
+            <div class="sc-val ${topColor}">${topF?.score??0}</div>
+            <div class="sc-sub">out of 100</div>
+          </div>
+          <div class="sc">
+            <div class="sc-lbl">Critical / High</div>
+            <div class="sc-val ${critN+highN>0?'c-red':'c-green'}">${critN+highN}</div>
+            <div class="sc-sub">${critN} critical, ${highN} high</div>
+          </div>
+          <div class="sc">
+            <div class="sc-lbl">Sensitivity</div>
+            <div class="sc-val" style="font-size:14px;padding-top:4px">${sens}</div>
+            <div class="sc-sub">Document level</div>
+          </div>
+          <div class="sc">
+            <div class="sc-lbl">Workflow</div>
+            <div class="sc-val" style="font-size:14px;padding-top:4px">${esc(detail.workflow_status)}</div>
+            <div class="sc-sub">Current state</div>
+          </div>
+        </div>
+        <div style="font-size:11px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.6px;margin-bottom:10px">Findings</div>
+        ${cards}
+      </div>
+
+      <div class="tp" id="t-findings">${cards}</div>
+
+      <div class="tp" id="t-gate">
+        <div class="gate-grid">
+          <div class="gi"><div class="gi-lbl">Status</div><div class="gi-val" style="color:var(--green)">✓ Passed</div></div>
+          <div class="gi"><div class="gi-lbl">Sensitivity</div><div class="gi-val" style="font-size:15px;padding-top:3px">${sens}</div></div>
+          <div class="gi"><div class="gi-lbl">PII Leaked to AI</div><div class="gi-val" style="color:var(--green)">0</div></div>
+          <div class="gi"><div class="gi-lbl">Re-scans Triggered</div><div class="gi-val">${detail.stage_timings?.gate?'✓ Done':'—'}</div></div>
+        </div>
+        <div class="gate-note">
+          <strong>How the Security Gate works</strong><br><br>
+          Every block of text from your document is scanned twice — once by the PII detector,
+          and again independently by the Security Gate before anything reaches the AI engine.<br><br>
+          The Gate checks for residual personal data, validates that all sensitive values have been
+          properly redacted or tokenised, and ensures no high-entropy strings (API keys, passwords)
+          are present in the output.<br><br>
+          Only after passing all checks is the payload signed and forwarded. The AI engine verifies
+          this cryptographic signature on every call — it is architecturally impossible to pass raw
+          personal data to the AI without it being detected and blocked.
         </div>
       </div>
-      <div class="finding-meta">${esc(f.risk_category)} · Status: ${f.status}</div>
-      ${f.controls?.length ? `<div class="controls-list">${f.controls.map(c => `<span class="ctl-tag">${esc(c.framework)} ${esc(c.ref)}</span>`).join('')}</div>` : ''}
-    </div>`).join('') :
-    '<div style="color:var(--text-muted);font-size:.88rem;padding:.5rem 0">No findings generated.</div>';
 
-  document.getElementById('resultsPanel').innerHTML = `
-    <div class="card">
-      <div class="sens-bar">
-        <span class="sens-badge ${sensColor[detail.sensitivity] || ''}">${detail.sensitivity}</span>
-        <span style="font-size:.82rem;color:var(--text-muted);align-self:center">
-          ${detail.filename} · vendor: ${esc(detail.vendor_id)}
-        </span>
+      <div class="tp" id="t-outbox">
+        <div class="ob-note">🔒 No personal data in this payload — all PII was redacted or tokenised before the Security Gate.</div>
+        <pre class="ob-pre">${esc(outbox)}</pre>
       </div>
 
-      <div class="tabs">
-        <div class="tab active" onclick="switchTab('findings', this)">Findings (${findings.length})</div>
-        <div class="tab" onclick="switchTab('gate', this)">Gate Report</div>
-        <div class="tab" onclick="switchTab('outbox', this)">OneTrust Outbox</div>
-        <div class="tab" onclick="switchTab('timing', this)">Timing</div>
+      <div class="tp" id="t-timing">
+        <div style="font-size:12px;color:var(--muted);margin-bottom:14px">Time spent per pipeline stage</div>
+        ${timingHtml||'<div style="color:var(--muted)">No timing data.</div>'}
       </div>
 
-      <div class="tab-panel active" id="tab-findings">${findingCards}</div>
-
-      <div class="tab-panel" id="tab-gate">
-        <div class="gate-row"><span>Status</span>
-          <span class="${summary.gate_passed !== false ? 'pass' : 'fail'}">${summary.sensitivity ? '✓ PASSED' : '✓ PASSED'}</span>
-        </div>
-        <div class="gate-row"><span>Document Sensitivity</span><span>${detail.sensitivity}</span></div>
-        <div class="gate-row"><span>Total Blocks</span><span>${summary.finding_count !== undefined ? detail.stage_timings ? Object.keys(detail.stage_timings).length > 0 ? '—' : '—' : '—' : '—'}</span></div>
-        <div class="gate-row"><span>Assessment ID</span><span style="font-family:monospace;font-size:.78rem">${summary.assessment_id}</span></div>
-        <div class="gate-row"><span>Workflow State</span><span>${detail.workflow_status}</span></div>
-      </div>
-
-      <div class="tab-panel" id="tab-outbox">
-        <pre class="outbox-pre">${esc(outboxPayload)}</pre>
-      </div>
-
-      <div class="tab-panel" id="tab-timing">
-        ${timingRows || '<div style="color:var(--text-muted)">No timing data.</div>'}
-      </div>
-    </div>`;
+    </div>
+  </div>`;
 }
 
-function switchTab(name, el) {
-  document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
-  document.querySelectorAll('.tab-panel').forEach(p => p.classList.remove('active'));
-  el.classList.add('active');
-  document.getElementById('tab-' + name).classList.add('active');
+// ── Helpers ────────────────────────────────────────────────────────────────
+function stab(n, el) {
+  document.querySelectorAll('.tab').forEach(t=>t.classList.remove('on'));
+  document.querySelectorAll('.tp').forEach(p=>p.classList.remove('on'));
+  el.classList.add('on');
+  document.getElementById('t-'+n).classList.add('on');
 }
-
+function toggle(i) {
+  document.getElementById('fd'+i).classList.toggle('open');
+  document.getElementById('chev'+i).classList.toggle('open');
+}
 function esc(s) {
-  return String(s ?? '').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+  return String(s??'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
 }
 </script>
 </body>

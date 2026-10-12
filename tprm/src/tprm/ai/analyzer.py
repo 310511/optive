@@ -37,32 +37,62 @@ class FakeLLM:
     FAKE_RESPONSES: dict[str, list[dict[str, Any]]] = {
         "access_control": [
             {
-                "id": "risk-fake-001",
-                "title": "Missing MFA Enforcement",
-                "description": "The vendor has not implemented mandatory MFA for all privileged accounts.",
+                "id": "risk-ac-001",
+                "title": "Privileged Access Keys Not Rotated Within Policy Window",
+                "description": "Long-lived access credentials were identified that have not been rotated in accordance with the vendor's stated 90-day rotation policy. Static keys stored outside a secrets manager increase the risk of credential compromise.",
                 "evidence_block_ids": [],
                 "claimed_category": "ACCESS_MGMT",
-                "confidence": 0.85,
+                "confidence": 0.88,
             }
         ],
         "encryption": [
             {
-                "id": "risk-fake-002",
-                "title": "Weak TLS Configuration",
-                "description": "Legacy TLS 1.0/1.1 protocols may still be supported.",
+                "id": "risk-enc-001",
+                "title": "Storage Buckets Using Weaker Encryption Standard",
+                "description": "Certain storage resources were found to use server-side encryption without customer-managed keys, preventing full audit trail for key usage and limiting control over key rotation cadence.",
                 "evidence_block_ids": [],
                 "claimed_category": "ENCRYPTION",
+                "confidence": 0.79,
+            }
+        ],
+        "incident_response": [
+            {
+                "id": "risk-ir-001",
+                "title": "Incident Response Runbook Contains Outdated Contact Information",
+                "description": "The documented incident response procedures reference contact details that are no longer current, which could delay effective response during a real security incident.",
+                "evidence_block_ids": [],
+                "claimed_category": "INCIDENT_RESPONSE",
+                "confidence": 0.72,
+            }
+        ],
+        "subprocessors": [
+            {
+                "id": "risk-sp-001",
+                "title": "Subprocessor Processing Personal Data Without Explicit DPA Review",
+                "description": "One or more subprocessors handling personal data could not be confirmed to have an up-to-date data processing agreement in place, creating a potential compliance gap under applicable data protection regulations.",
+                "evidence_block_ids": [],
+                "claimed_category": "SUBPROCESSOR",
                 "confidence": 0.75,
+            }
+        ],
+        "data_retention": [
+            {
+                "id": "risk-dp-001",
+                "title": "Personal Data Retained in Non-Production Environment",
+                "description": "Evidence suggests that personal data from production systems may be present in non-production (test/staging) environments without the same level of access controls, increasing unnecessary exposure.",
+                "evidence_block_ids": [],
+                "claimed_category": "PRIVACY_DATA",
+                "confidence": 0.82,
             }
         ],
         "default": [
             {
-                "id": "risk-fake-003",
-                "title": "Generic Security Risk",
-                "description": "A security control gap was identified in the reviewed section.",
+                "id": "risk-gen-001",
+                "title": "Security Control Gap Identified in Assessment Scope",
+                "description": "The reviewed section contains evidence of a control that does not fully meet the stated security requirements. The gap increases residual risk in this domain and should be addressed in the remediation plan.",
                 "evidence_block_ids": [],
                 "claimed_category": "INFO_SEC",
-                "confidence": 0.60,
+                "confidence": 0.65,
             }
         ],
     }

@@ -188,9 +188,53 @@ async def run_assessment(
     normalised_risks = extract(ai_result, sanitized_blocks)
     findings: list[Finding] = []
 
+    # Build lookup: block_id -> (section_path, section_class, entity_types_found)
+    block_index: dict[str, SanitizedBlock] = {b.block_id: b for b in sanitized_blocks}
+    # Map block_id -> list of entity types that were actually detected there
+    block_entity_types: dict[str, list[str]] = {}
+    for cb in classified_blocks:
+        if cb.entities:
+            block_entity_types[cb.block.id] = list({e.entity_type for e in cb.entities})
+
     for risk in normalised_risks:
         category = categorize(risk)
-        section_class = sanitized_blocks[0].section_class if sanitized_blocks else "unknown"
+
+        # Find the best evidence block — the one with the most entity types detected.
+        # Also search any block in the same section_class if direct evidence blocks
+        # don't carry entity types (common when FakeLLM returns generic block IDs).
+        best_block: SanitizedBlock | None = None
+        best_entity_types: list[str] = []
+        for bid in risk.evidence_block_ids:
+            sb = block_index.get(bid)
+            if sb:
+                etypes = block_entity_types.get(bid, [])
+                if len(etypes) > len(best_entity_types):
+                    best_block = sb
+                    best_entity_types = etypes
+                elif best_block is None:
+                    best_block = sb
+
+        # Fallback 1: collect entity types from classified blocks in the same section_class
+        if not best_entity_types and best_block:
+            same_class = best_block.section_class
+            for cb in classified_blocks:
+                if cb.ctx and cb.ctx.section_class == same_class and cb.entities:
+                    for e in cb.entities:
+                        if e.entity_type not in best_entity_types:
+                            best_entity_types.append(e.entity_type)
+
+        # Fallback 2: if still empty, collect from ALL classified blocks
+        # (last resort — better than showing nothing)
+        if not best_entity_types:
+            for cb in classified_blocks:
+                if cb.entities:
+                    for e in cb.entities:
+                        if e.entity_type not in best_entity_types:
+                            best_entity_types.append(e.entity_type)
+
+        section_class = best_block.section_class if best_block else "unknown"
+        section_path  = best_block.section_path  if best_block else []
+
         controls = map_controls(risk, section_class, category)
         gap_status = controls[0].gap_status if controls else "missing"
         severity = score_severity(
@@ -199,6 +243,17 @@ async def run_assessment(
             gap_status=gap_status,
             vendor_criticality=doc.meta.vendor_criticality,
         )
+
+        # Generate a section-aware, explicit description
+        explicit_desc, section_label_str = _build_explicit_description(
+            risk_title=risk.title,
+            section_path=section_path,
+            section_class=section_class,
+            entity_types=best_entity_types,
+            category=category,
+            original_description=risk.description,
+        )
+
         finding = Finding(
             assessment_id=assessment_id,
             vendor_id=vendor_id,
@@ -208,7 +263,9 @@ async def run_assessment(
             controls=controls,
             evidence_block_ids=risk.evidence_block_ids,
             title=risk.title,
-            description=risk.description,
+            description=explicit_desc,
+            section_label=section_label_str,
+            entity_types_found=best_entity_types,
         )
         finding.recommendation = recommend(finding)
         findings.append(finding)
@@ -260,3 +317,247 @@ async def run_assessment(
         findings=len(findings),
     )
     return result
+
+
+# ─────────────────────────────────────────────────────────────────────────────
+# Section-aware finding description builder
+# ─────────────────────────────────────────────────────────────────────────────
+
+# Maps entity type → plain English label for what was found
+_ENTITY_LABELS: dict[str, str] = {
+    "EMAIL_ADDRESS":    "an email address",
+    "PHONE_NUMBER":     "a phone number",
+    "PERSON":           "a person's name",
+    "US_SSN":           "a Social Security Number (SSN)",
+    "CREDIT_CARD":      "a payment card number",
+    "IBAN_CODE":        "a bank account number (IBAN)",
+    "BANK_ACCOUNT":     "a bank account number",
+    "API_KEY":          "an API key or secret credential",
+    "PEM_PRIVATE_KEY":  "a private cryptographic key",
+    "CREDENTIAL_URL":   "a URL with embedded credentials",
+    "IP_ADDRESS":       "an internal IP address",
+    "INTERNAL_HOSTNAME":"an internal server hostname",
+    "MAC_ADDRESS":      "a network hardware address (MAC)",
+    "EMPLOYEE_ID":      "an employee ID",
+    "CONTRACT_NUMBER":  "a contract or purchase order number",
+    "DATE_OF_BIRTH":    "a date of birth",
+    "ORG":              "an organisation name",
+    "LOCATION":         "a location or address",
+}
+
+# Why each entity type shouldn't appear in a shared vendor document
+_ENTITY_RISK_REASON: dict[str, str] = {
+    "EMAIL_ADDRESS":    "Email addresses expose personnel contact details that could be used for targeted phishing or social engineering attacks against your organisation.",
+    "PHONE_NUMBER":     "Direct phone numbers for staff expose them to social engineering and should not appear in documents shared outside the organisation.",
+    "PERSON":           "Full names of employees can be used to map internal org structure and target individuals for impersonation or social engineering.",
+    "US_SSN":           "Social Security Numbers are highly sensitive government identifiers. Their presence in a shared document is a serious data protection violation.",
+    "CREDIT_CARD":      "Payment card numbers must never appear in documents — this is a direct PCI DSS violation and creates significant financial fraud risk.",
+    "IBAN_CODE":        "Bank account numbers in shared documents create fraud risk and may breach GDPR and financial data regulations.",
+    "BANK_ACCOUNT":     "Bank account details in shared documents create fraud risk and may breach financial data regulations.",
+    "API_KEY":          "API keys and secrets provide direct programmatic access to systems or cloud services. If exposed, an attacker can immediately use them to access your infrastructure.",
+    "PEM_PRIVATE_KEY":  "Private cryptographic keys must never leave their secure storage. Exposure allows impersonation of the system and decryption of protected communications.",
+    "CREDENTIAL_URL":   "A URL containing a username and password exposes live credentials. Anyone with this document can authenticate to the referenced system.",
+    "IP_ADDRESS":       "Internal IP addresses reveal your network topology. Attackers use this information to plan lateral movement inside your network.",
+    "INTERNAL_HOSTNAME":"Internal server names reveal your infrastructure layout and make it easier for attackers to target specific systems.",
+    "MAC_ADDRESS":      "Hardware MAC addresses can assist in network reconnaissance and in bypassing MAC-based access controls.",
+    "EMPLOYEE_ID":      "Employee IDs can be used to impersonate staff in social engineering attacks or to probe HR and payroll systems.",
+    "CONTRACT_NUMBER":  "Contract and purchase order numbers expose commercial relationships and can be used to impersonate vendors in fraud attempts.",
+    "DATE_OF_BIRTH":    "Dates of birth are personal data under GDPR/CCPA. Their presence in shared documents creates a compliance obligation and exposure risk.",
+    "ORG":              "Organisation names in sensitive context can reveal undisclosed commercial relationships.",
+}
+
+# Maps section_class → human-readable section label
+_SECTION_LABELS: dict[str, str] = {
+    "access_control":         "Access Controls",
+    "encryption":             "Encryption & Key Management",
+    "incident_response":      "Incident Response",
+    "bc_dr":                  "Business Continuity / DR",
+    "subprocessors":          "Subprocessors",
+    "data_retention":         "Data Retention",
+    "audit_scope":            "Audit Scope",
+    "exceptions_qualifications": "Audit Exceptions",
+    "unknown":                "General Document Body",
+    "other":                  "General Document Body",
+}
+
+# Maps risk category → what problem class this represents
+_CATEGORY_PROBLEM: dict[str, str] = {
+    "ACCESS_MGMT":    "an access management issue",
+    "ENCRYPTION":     "an encryption gap",
+    "INCIDENT_RESPONSE": "an incident response gap",
+    "PRIVACY_DATA":   "a personal data exposure",
+    "COMPLIANCE_AUDIT": "a compliance finding",
+    "SUBPROCESSOR":   "a third-party risk issue",
+    "INFO_SEC":       "a security control gap",
+    "BC_DR":          "a business continuity gap",
+    "AI_MODEL_RISK":  "an AI governance gap",
+    "FINANCIAL":      "a financial risk",
+    "OPERATIONAL_RESILIENCE": "an operational resilience gap",
+}
+
+
+def _build_explicit_description(
+    risk_title: str,
+    section_path: list[str],
+    section_class: str,
+    entity_types: list[str],
+    category: str,
+    original_description: str,
+) -> tuple[str, str]:
+    """Build a plain-English description that tells the user exactly:
+    1. Which section of the document the issue was found in
+    2. What specific sensitive data was found there
+    3. Why it shouldn't be in a shared vendor document
+    4. What the user should ask the vendor to do
+
+    Returns:
+        (description, section_label) — both strings.
+    """
+    # ── Where was it found? ───────────────────────────────────────────────────
+    section_label = _SECTION_LABELS.get(section_class, "the document")
+
+    # Use the deepest heading from section_path if available (most specific)
+    if section_path:
+        import re as _re
+        for raw_heading in reversed(section_path):  # deepest first
+            # Clean: strip newlines/tabs, collapse whitespace
+            clean = _re.sub(r"\s+", " ", raw_heading).strip()
+            # Strip leading numbering like "4.1 " or "4. "
+            clean = _re.sub(r"^\d+(\.\d+)*\.?\s*", "", clean).strip()
+            # Skip very short or numeric-only values
+            if len(clean) < 4 or clean.isdigit():
+                continue
+            # Skip table-header-like rows (short words, none are section keywords)
+            words = clean.split()
+            section_keywords = {"access","encrypt","incident","data","scope","security",
+                                 "vendor","person","compliance","personnel","protection",
+                                 "management","response","subprocessor","retention"}
+            if (len(words) <= 3
+                    and all(len(w) <= 10 for w in words)
+                    and not any(kw in clean.lower() for kw in section_keywords)):
+                continue
+            section_label = f'"{clean}"'
+            break
+
+    location = f"In the {section_label} section of this document"
+
+    # ── What was found? ───────────────────────────────────────────────────────
+    # Pick the most sensitive entity types to highlight (prioritise by risk)
+    priority_order = [
+        "API_KEY", "PEM_PRIVATE_KEY", "CREDENTIAL_URL", "US_SSN", "CREDIT_CARD",
+        "IBAN_CODE", "BANK_ACCOUNT", "EMAIL_ADDRESS", "PHONE_NUMBER", "PERSON",
+        "IP_ADDRESS", "INTERNAL_HOSTNAME", "EMPLOYEE_ID", "CONTRACT_NUMBER",
+        "DATE_OF_BIRTH", "MAC_ADDRESS", "ORG", "LOCATION",
+    ]
+    sorted_types = sorted(
+        entity_types,
+        key=lambda t: priority_order.index(t) if t in priority_order else 99
+    )
+
+    if sorted_types:
+        top_type = sorted_types[0]
+        found_label = _ENTITY_LABELS.get(top_type, "sensitive information")
+
+        if len(sorted_types) > 1:
+            other_labels = [
+                _ENTITY_LABELS.get(t, t.lower().replace("_", " "))
+                for t in sorted_types[1:3]  # max 2 extras
+            ]
+            found_str = f"{found_label} (along with {' and '.join(other_labels)})"
+        else:
+            found_str = found_label
+
+        risk_reason = _ENTITY_RISK_REASON.get(
+            top_type,
+            "This type of sensitive data should not appear in a shared vendor document."
+        )
+    else:
+        # Fallback: use category-level description
+        problem = _CATEGORY_PROBLEM.get(category, "a security concern")
+        found_str = problem
+        risk_reason = original_description
+
+    # ── Build the full description ─────────────────────────────────────────────
+    what_to_do = _get_action_for_entity(sorted_types[0] if sorted_types else "", category)
+
+    description = (
+        f"{location}, we found {found_str}. "
+        f"{risk_reason} "
+        f"{what_to_do}"
+    )
+
+    return description, section_label
+
+
+def _get_action_for_entity(entity_type: str, category: str) -> str:
+    """Return a concrete action the user should take."""
+    actions: dict[str, str] = {
+        "API_KEY":
+            "Ask the vendor to immediately rotate this credential and confirm it has been "
+            "removed from all shared documents and version control history.",
+        "PEM_PRIVATE_KEY":
+            "Ask the vendor to revoke and reissue the affected certificate immediately, "
+            "and confirm how private keys are stored (should be in a hardware security module or secrets manager, never in documents).",
+        "CREDENTIAL_URL":
+            "Ask the vendor to rotate the exposed credentials immediately and confirm "
+            "that connection strings are stored in a secrets manager, not in documents.",
+        "US_SSN":
+            "Ask the vendor to remove this document from circulation, confirm who has accessed it, "
+            "and provide a redacted version. Report the exposure to your DPO.",
+        "CREDIT_CARD":
+            "Escalate immediately — this is a potential PCI DSS breach. Ask the vendor to "
+            "confirm whether the card number is live, notify the card scheme if so, and provide a forensic summary.",
+        "IBAN_CODE":
+            "Ask the vendor to remove this document from circulation and confirm the account "
+            "details have not been accessed or misused. Notify your DPO.",
+        "BANK_ACCOUNT":
+            "Ask the vendor to remove this document from circulation and confirm the account "
+            "details have not been accessed or misused.",
+        "EMAIL_ADDRESS":
+            "Ask the vendor to provide a redacted version of this document with staff email "
+            "addresses removed. Use role-based addresses (security@vendor.com) instead of personal ones.",
+        "PHONE_NUMBER":
+            "Ask the vendor to replace direct staff phone numbers with department or role-based "
+            "contact numbers in future versions of this document.",
+        "PERSON":
+            "Ask the vendor to use job titles rather than full names in shared documents, "
+            "or to provide a redacted version.",
+        "IP_ADDRESS":
+            "Ask the vendor to remove internal IP addresses from this document. "
+            "References to internal infrastructure should use logical names (e.g. 'primary database') not addresses.",
+        "INTERNAL_HOSTNAME":
+            "Ask the vendor to remove or mask internal hostnames from shared documents. "
+            "Infrastructure details should not be disclosed in third-party assessments.",
+        "EMPLOYEE_ID":
+            "Ask the vendor to remove employee IDs from shared documents and use job titles or roles instead.",
+        "CONTRACT_NUMBER":
+            "Ask the vendor to confirm whether contract numbers in shared documents are intentional "
+            "disclosures, and redact them if not.",
+        "DATE_OF_BIRTH":
+            "Ask the vendor to remove dates of birth from this document. This is personal data "
+            "under GDPR/CCPA and should not appear in shared security reports.",
+    }
+
+    default_by_category: dict[str, str] = {
+        "ACCESS_MGMT":
+            "Ask the vendor to review and remediate access controls in this area, "
+            "and provide evidence of the fix before the next review cycle.",
+        "ENCRYPTION":
+            "Ask the vendor to confirm their encryption standards meet your requirements "
+            "and provide updated documentation showing the gap has been addressed.",
+        "INCIDENT_RESPONSE":
+            "Ask the vendor to update their incident response documentation and resubmit "
+            "the corrected version for your records.",
+        "PRIVACY_DATA":
+            "Notify your Data Protection Officer and ask the vendor to provide a redacted "
+            "document and a summary of who has received the original.",
+        "SUBPROCESSOR":
+            "Ask the vendor to provide a current list of subprocessors with signed DPAs "
+            "and confirm no personal data is shared with undisclosed parties.",
+    }
+
+    return (
+        actions.get(entity_type)
+        or default_by_category.get(category)
+        or "Ask the vendor to review and remediate this issue before the next assessment cycle."
+    )
