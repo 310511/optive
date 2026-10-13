@@ -111,7 +111,7 @@ async def get_dashboard(
         "services": {
             "api": "ok",
             "gate": "ok",
-            "ollama": "mock",
+            "ollama": "live",
             "onetrust": "mock",
             "database": "in-memory",
         },
@@ -164,7 +164,7 @@ async def create_assessment(
         tmp_path = Path(tmp.name)
 
     try:
-        result = await run_assessment(tmp_path, vendor_id=vendor_id, use_fake_llm=True)
+        result = await run_assessment(tmp_path, vendor_id=vendor_id, use_fake_llm=False)
         _assessments[result.assessment_id] = result
         _state_machines[result.assessment_id] = WorkflowStateMachine()
         _gate_decisions[result.assessment_id] = {

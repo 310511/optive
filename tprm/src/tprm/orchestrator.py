@@ -14,7 +14,7 @@ import uuid
 from pathlib import Path
 from typing import Any
 
-from tprm.ai.analyzer import FakeLLM, LLMBackend, analyze
+from tprm.ai.analyzer import FakeLLM, LLMBackend, _build_langchain_llm, analyze
 from tprm.common.audit import get_audit_log
 from tprm.common.config import get_settings
 from tprm.common.errors import GateViolation, SanitizationError
@@ -69,8 +69,10 @@ async def run_assessment(
     timings: dict[str, float] = {}
     settings = get_settings()
 
-    if use_fake_llm or llm is None:
+    if use_fake_llm:
         llm = llm or FakeLLM()
+    elif llm is None:
+        llm = _build_langchain_llm(settings)
 
     log.info("assessment_start", assessment_id=assessment_id, vendor_id=vendor_id, file=file_path.name)
 
